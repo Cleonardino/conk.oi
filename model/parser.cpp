@@ -14,30 +14,33 @@ std::vector<std::string> split(const std::string& str, char split_char) {
         }
     }
 
-    if (!part.empty()) result.push_back(part); // Add last token
+    result.push_back(part);
     return result;
 }
 
 // Parse a csv file into a map
 Map parse_csv(std::string filepath) {
-    std::ifstream file(filepath); // Replace with your file path
+    std::ifstream file(filepath);
     std::string line;
-
+    std::vector<std::string> splitted_line;
+    int height, width;
     if (file.is_open()) {
         // Getting first line with map size
         std::getline(file, line);
+        splitted_line = split(line,',');
+
+        height = std::stoi(splitted_line[0]);
+        width = std::stoi(splitted_line[1]);
+
+        Map result = Map(height,width);
         while(std::getline(file, line)){
-            switch (line[0])
-            {
-            case ' ':
-                // Ocean
-                break;
-            
-            default:
-                break;
+            splitted_line = split(line,',');
+            for(std::string tilestring : splitted_line){
+                // Decomposing tilestring into a tile
             }
         }
         file.close();
+        return result;
     } else {
         std::cerr << "Error : " << filepath << "could not be opened" << std::endl;
     }
