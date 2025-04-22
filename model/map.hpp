@@ -4,14 +4,30 @@
 #include <iostream>
 #include <vector>
 
+enum TileType {
+    Forest,
+    Ocean,
+    Land
+};
+
+enum CharacterType {
+    Empty,
+    Peasant,
+    Soldier,
+    Knight
+};
+
 class Tile{
     private:
+    TileType tile_type;
     int owner_id;
     bool has_wall;
-    int character_type;
+    bool has_town;
+    CharacterType character_type;
 
     public:
     Tile();
+    friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
 };
 
 class Map{
