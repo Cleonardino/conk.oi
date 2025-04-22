@@ -1,5 +1,5 @@
-#ifndef MAP_CPP
-#define MAP_CPP
+#ifndef MAP_HPP
+#define MAP_HPP
 
 #include <iostream>
 #include <vector>
@@ -22,6 +22,7 @@ class Map{
 
     public:
     Map(int height, int width);
+    friend std::ostream& operator<<(std::ostream& os, const Map& map);
 };
 
 #endif
