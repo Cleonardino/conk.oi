@@ -1,8 +1,43 @@
 #include "map.hpp"
 
-Tile::Tile():
-owner_id(-1), has_wall(false), character_type(Empty), tile_type(Land)
+// Class constructor
+Tile::Tile(TileType tile_type, int owner_id, bool has_wall,
+BuildingType building_type, CharacterType character_type):
+    tile_type(tile_type), owner_id(owner_id), has_wall(has_wall),
+    building_type(building_type), character_type(character_type)
 {}
+
+// The default Tile, used in map initialisation
+Tile Tile::default_Tile(){
+    return Tile(Ocean,-1,false,Wild,Empty);
+}
+
+// Update the Tile parameters
+void Tile::update_tile(TileType tile_type, int owner_id, bool has_wall,
+    BuildingType building_type, CharacterType character_type){
+    tile_type = tile_type;
+    owner_id = owner_id;
+    has_wall = has_wall;
+    building_type = building_type;
+    character_type = character_type;
+}
+
+// Getter functions
+TileType Tile::get_type(){
+    return tile_type;
+}
+int Tile::get_owner(){
+    return owner_id;
+}
+bool Tile::get_wall(){
+    return has_wall;
+}
+BuildingType Tile::get_building(){
+    return building_type;
+}
+CharacterType Tile::get_character(){
+    return character_type;
+}
 
 // Used for debugging purpose and testing of game's logic
 std::ostream& operator<<(std::ostream& os, const Tile& tile) {
@@ -13,7 +48,7 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
         break;
     
     case Forest:
-        os << "~~~~~" << std::endl;
+        os << "&&&&&" << std::endl;
         break;
     
     case Land:
@@ -75,11 +110,20 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
             break;
         }
 
-        // Print town
-        if(tile.has_town){
-            os << "T" << std::endl;
-        }else{
+        // Print building
+        switch (tile.building_type)
+        {
+        case Wild:
             os << " " << std::endl;
+            break;
+
+        case Town:
+            os << "T" << std::endl;
+            break;
+
+        case Fortress:
+            os << "F" << std::endl;
+            break;
         }
 
         // Print wall
@@ -89,20 +133,33 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
             os << " " << std::endl;
         }
     }
+    return os;
 }
 
-Map::Map(int height, int width):
-height(height), width(width), data(height, std::vector<Tile>(width, Tile()))
+// Class constructor
+Map::Map(int height_, int width_):
+height(height_), width(width_), data(height_, std::vector<Tile>(width_, Tile::default_Tile()))
 {}
+
+// Get a Tile based on its coordinates
+Tile Map::get_Tile(int row, int column){
+    return data[row][column];
+}
+
+// Set a Tile based on its coordinates
+void Map::set_Tile(int row, int column, TileType tile_type, int owner_id,
+    bool has_wall, BuildingType building_type, CharacterType character_type){
+    data[row][column].update_tile(tile_type,owner_id,has_wall,building_type,character_type);
+}
 
 // Used for debugging purpose and testing of game's logic
 std::ostream& operator<<(std::ostream& os, const Map& map) {
-        os << "===== MAP (" << map.height << "x" << map.width << ") =====" << std::endl;
-        for(auto line : map.data){
-            for(auto tile : line){
-                os << tile;
-            }
-            os << std::endl;
+    os << "===== MAP (" << map.height << "x" << map.width << ") =====" << std::endl;
+    for(auto line : map.data){
+        for(auto tile : line){
+            os << tile;
         }
-        return os;
+        os << std::endl << std::endl;
+    }
+    return os;
 }

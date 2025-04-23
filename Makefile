@@ -8,15 +8,11 @@ SRC = model/parser.cpp
 OBJS = $(SRC:.cpp=.o)
 
 # Default target
-all: $(TARGET)
+parser: model/map.o model/parser.o
+	$(COMPILER) -o parser model/*.o $(FLAGS)
 
-$(TARGET): $(OBJS)
-	$(COMPILER) $(FLAGS) -o $@ $^
-
-%.o: %.cpp parser.hpp
-	$(COMPILER) $(FLAGS) -c $<
+%.o: %.cpp
+	$(COMPILER) -o $@ -c $< $(FLAGS)
 
 clean:
-	rm -f $(TARGET) $(OBJS)
-
-.PHONY: all clean
+	rm -f *.o

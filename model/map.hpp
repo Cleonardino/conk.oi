@@ -17,20 +17,35 @@ enum CharacterType {
     Knight
 };
 
+enum BuildingType {
+    Wild,
+    Town,
+    Fortress
+};
+
 class Tile{
     private:
     TileType tile_type;
     int owner_id;
     bool has_wall;
-    bool has_town;
+    BuildingType building_type;
     CharacterType character_type;
 
     public:
 
-    Tile();
+    Tile(TileType tile_type, int owner_id, bool has_wall,
+        BuildingType building_type, CharacterType character_type);
 
-    Tile update_tile(TileType tile_type, int owner_id, bool has_wall,
-    bool has_town, CharacterType character_type);
+    static Tile default_Tile();
+
+    void update_tile(TileType tile_type, int owner_id, bool has_wall,
+        BuildingType building_type, CharacterType character_type);
+
+    TileType get_type();
+    int get_owner();
+    bool get_wall();
+    BuildingType get_building();
+    CharacterType get_character();
 
     friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
 };
@@ -42,8 +57,11 @@ class Map{
     int width;
 
     public:
-    
-    Map(int height, int width);
+
+    Map(int height_, int width_);
+    Tile get_Tile(int row, int column);
+    void set_Tile(int row, int column, TileType tile_type, int owner_id,
+        bool has_wall, BuildingType building_type, CharacterType character_type);
 
     friend std::ostream& operator<<(std::ostream& os, const Map& map);
 };
