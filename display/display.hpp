@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <iostream>
+#include <vector>
 
 class Display {
     private:
@@ -10,6 +11,7 @@ class Display {
         bool isRunning;
         SDL_Window *window;
         SDL_Renderer *renderer;
+        int map[20][20];
     public:
     Display();
     ~Display();
@@ -20,7 +22,7 @@ class Display {
     void update();
     void render();
     void clean();
-
+    void DrawMap();
     bool running() { return isRunning; }
 
 };

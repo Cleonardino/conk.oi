@@ -1,11 +1,12 @@
 #include "display.hpp"
+#include "texturemanager.hpp"
 
 Display::Display(){}
 Display::~Display(){}
 
 
 SDL_Texture *TileText;
-SDL_Rect srcR, destR;
+SDL_Rect src, dest;
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -36,10 +37,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     {
         isRunning = false;
     }
-
-    SDL_Surface* tmpSurface = IMG_Load("../art/base_tile.png");
-    TileText = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-    SDL_FreeSurface(tmpSurface);
+    TileText = TextureManager::LoadTexture("../art/tiles/base_tile.png", renderer);
 }
 
 void Display::handleEvents()
@@ -56,16 +54,35 @@ void Display::handleEvents()
 void Display::update()
 {
     cmt++;
-    destR.h = 32;
-    destR.w = 32;
-    std::cout << cmt << std::endl;
 }
 void Display::render()
 {
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, TileText, NULL, &destR);
+    this->DrawMap();
     SDL_RenderPresent(renderer);
 }
+
+void Display::DrawMap()
+{
+    src.y = src.x = 0;
+    dest.x = dest.y = 0;
+    src.w = dest.w = 32;
+    src.h = dest.h = 32;
+    for(int i = 0; i<20;i++)
+    {
+        for(int j = 0; j<20;j++)
+        {
+            dest.x = j * 32;
+            dest.y = i * 19;
+            if ( i%2 == 1)
+            {
+                dest.x += 16;
+            }
+            TextureManager::Draw(renderer, TileText, src, dest);
+        }
+    }
+}
+
 void Display::clean()
 {
     SDL_DestroyWindow(window);
