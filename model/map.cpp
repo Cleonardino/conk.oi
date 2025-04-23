@@ -1,10 +1,10 @@
 #include "map.hpp"
 
 // Class constructor
-Tile::Tile(TileType tile_type, int owner_id, bool has_wall,
-BuildingType building_type, CharacterType character_type):
-    tile_type(tile_type), owner_id(owner_id), has_wall(has_wall),
-    building_type(building_type), character_type(character_type)
+Tile::Tile(TileType tile_type_, int owner_id_, bool has_wall_,
+BuildingType building_type_, CharacterType character_type_):
+    tile_type(tile_type_), owner_id(owner_id_), has_wall(has_wall_),
+    building_type(building_type_), character_type(character_type_)
 {}
 
 // The default Tile, used in map initialisation
@@ -13,13 +13,13 @@ Tile Tile::default_Tile(){
 }
 
 // Update the Tile parameters
-void Tile::update_tile(TileType tile_type, int owner_id, bool has_wall,
-    BuildingType building_type, CharacterType character_type){
-    tile_type = tile_type;
-    owner_id = owner_id;
-    has_wall = has_wall;
-    building_type = building_type;
-    character_type = character_type;
+void Tile::update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
+    BuildingType building_type_, CharacterType character_type_){
+    tile_type = tile_type_;
+    owner_id = owner_id_;
+    has_wall = has_wall_;
+    building_type = building_type_;
+    character_type = character_type_;
 }
 
 // Getter functions
@@ -44,19 +44,19 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
     switch (tile.tile_type)
     {
     case Ocean:
-        os << "     " << std::endl;
+        os << "     ";
         break;
     
     case Forest:
-        os << "&&&&&" << std::endl;
+        os << "&&&&&";
         break;
     
     case Land:
         // Print wall
         if(tile.has_wall){
-            os << "|" << std::endl;
+            os << "|";
         }else{
-            os << " " << std::endl;
+            os << " ";
         }
 
         // Print color
@@ -64,22 +64,22 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
         {
         case -1:
             // No owner
-            os << " " << std::endl;
+            os << " ";
             break;
         
         case 0:
-            // Player
-            os << "P" << std::endl;
+            // First player
+            os << "0";
             break;
         
         case 1:
-            // First enemy
-            os << "1" << std::endl;
+            // Second player
+            os << "1";
             break;
         
         case 2:
-            // Second enemy
-            os << "2" << std::endl;
+            // Third player
+            os << "2";
             break;
         
         default:
@@ -91,19 +91,19 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
         {
         case Empty:
             // No character
-            os << " " << std::endl;
+            os << " ";
             break;
         
         case Peasant:
-            os << "-" << std::endl;
+            os << "-";
             break;
         
         case Soldier:
-            os << "=" << std::endl;
+            os << "=";
             break;
         
         case Knight:
-            os << "#" << std::endl;
+            os << "#";
             break;
         
         default:
@@ -114,23 +114,23 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
         switch (tile.building_type)
         {
         case Wild:
-            os << " " << std::endl;
+            os << " ";
             break;
 
         case Town:
-            os << "T" << std::endl;
+            os << "T";
             break;
 
         case Fortress:
-            os << "F" << std::endl;
+            os << "F";
             break;
         }
 
         // Print wall
         if(tile.has_wall){
-            os << "|" << std::endl;
+            os << "|";
         }else{
-            os << " " << std::endl;
+            os << " ";
         }
     }
     return os;
@@ -155,11 +155,16 @@ void Map::set_Tile(int row, int column, TileType tile_type, int owner_id,
 // Used for debugging purpose and testing of game's logic
 std::ostream& operator<<(std::ostream& os, const Map& map) {
     os << "===== MAP (" << map.height << "x" << map.width << ") =====" << std::endl;
+    bool even_line_nb = true;
     for(auto line : map.data){
         for(auto tile : line){
-            os << tile;
+            os << tile << " ";
         }
         os << std::endl << std::endl;
+        even_line_nb = !even_line_nb;
+        if(!even_line_nb){
+            os << "   ";
+        }
     }
     return os;
 }

@@ -124,6 +124,7 @@ Map parse_csv(std::string filepath) {
                 // Update tile
                 result.set_Tile(cur_row, cur_column, tile_type, owner_id,
                     has_wall, building_type, character_type);
+                std::cout << cur_row << "x" << cur_column << " -> Type:" << tile_type << " Owner:" << owner_id << std::endl;
                 cur_column++;
             }
             cur_row++;
@@ -139,10 +140,7 @@ Map parse_csv(std::string filepath) {
 }
 
 int main(){
-    std::cout << Map(1,1);
     Map new_map = parse_csv("example_map.txt");
-    Tile test = new_map.get_Tile(0,0);
-    std::cout << test;
     std::cout << new_map;
     return 0;
 }

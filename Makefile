@@ -15,4 +15,4 @@ parser: model/map.o model/parser.o
 	$(COMPILER) -o $@ -c $< $(FLAGS)
 
 clean:
-	rm -f *.o
+	rm -f model/*.o

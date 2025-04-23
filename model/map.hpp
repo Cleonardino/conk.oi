@@ -5,9 +5,9 @@
 #include <vector>
 
 enum TileType {
-    Forest,
     Ocean,
-    Land
+    Land,
+    Forest
 };
 
 enum CharacterType {
@@ -33,13 +33,13 @@ class Tile{
 
     public:
 
-    Tile(TileType tile_type, int owner_id, bool has_wall,
-        BuildingType building_type, CharacterType character_type);
+    Tile(TileType tile_type_, int owner_id_, bool has_wall_,
+        BuildingType building_type_, CharacterType character_type_);
 
     static Tile default_Tile();
 
-    void update_tile(TileType tile_type, int owner_id, bool has_wall,
-        BuildingType building_type, CharacterType character_type);
+    void update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
+        BuildingType building_type_, CharacterType character_type_);
 
     TileType get_type();
     int get_owner();
