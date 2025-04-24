@@ -16,6 +16,7 @@ class Province{
     Province(std::string name_, int owner_id);
     int add_gold(int amount);
     int get_gold();
+    void add_coordinates()
 };
 
 // A class containing all the informations of the current game's state as well as the map.

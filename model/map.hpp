@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+using coordinates = std::pair<int,int>;
+
 enum TileType {
     Ocean,
     Land,
@@ -62,8 +64,8 @@ class Map{
     public:
 
     Map(int height_, int width_);
-    Tile get_Tile(int row, int column);
-    void set_Tile(int row, int column, TileType tile_type, int owner_id,
+    Tile get_Tile(coordinates location);
+    void set_Tile(coordinates location, TileType tile_type, int owner_id,
         bool has_wall, BuildingType building_type, CharacterType character_type);
 
     friend std::ostream& operator<<(std::ostream& os, const Map& map);

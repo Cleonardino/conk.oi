@@ -143,14 +143,14 @@ height(height_), width(width_), data(height_, std::vector<Tile>(width_, Tile::de
 {}
 
 // Get a Tile based on its coordinates
-Tile Map::get_Tile(int row, int column){
-    return data[row][column];
+Tile Map::get_Tile(coordinates location){
+    return data[location.first][location.second];
 }
 
 // Set a Tile based on its coordinates
-void Map::set_Tile(int row, int column, TileType tile_type, int owner_id,
+void Map::set_Tile(coordinates location, TileType tile_type, int owner_id,
     bool has_wall, BuildingType building_type, CharacterType character_type){
-    data[row][column].update_tile(tile_type,owner_id,has_wall,building_type,character_type);
+    data[location.first][location.second].update_tile(tile_type,owner_id,has_wall,building_type,character_type);
 }
 
 // Used for debugging purpose and testing of game's logic
