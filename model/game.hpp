@@ -9,12 +9,13 @@
 class Province{
     private:
     std::vector<std::pair<int, int>> coordinates;
-    std::string name;
     int owner_id;
     int gold;
 
     public:
     Province(std::string name_, int owner_id);
+    int add_gold(int amount);
+    int get_gold();
 };
 
 // A class containing all the informations of the current game's state as well as the map.
