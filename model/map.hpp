@@ -31,18 +31,19 @@ class Tile{
     private:
     TileType tile_type;
     int owner_id;
+    int province_id;
     bool has_wall;
     BuildingType building_type;
     CharacterType character_type;
 
     public:
 
-    Tile(TileType tile_type_, int owner_id_, bool has_wall_,
+    Tile(TileType tile_type_, int owner_id_, int province_id_ , bool has_wall_,
         BuildingType building_type_, CharacterType character_type_);
 
     static Tile default_Tile();
 
-    void update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
+    void update_tile(TileType tile_type_, int owner_id_, int province_id_, bool has_wall_,
         BuildingType building_type_, CharacterType character_type_);
 
     TileType get_type();
@@ -65,7 +66,7 @@ class Map{
 
     Map(int height_, int width_);
     Tile get_Tile(coordinates location);
-    void set_Tile(coordinates location, TileType tile_type, int owner_id,
+    void set_Tile(coordinates location, TileType tile_type, int owner_id, int province_id_,
         bool has_wall, BuildingType building_type, CharacterType character_type);
 
     friend std::ostream& operator<<(std::ostream& os, const Map& map);

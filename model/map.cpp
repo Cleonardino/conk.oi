@@ -1,15 +1,15 @@
 #include "map.hpp"
 
 // Class constructor
-Tile::Tile(TileType tile_type_, int owner_id_, bool has_wall_,
+Tile::Tile(TileType tile_type_, int owner_id_, int province_id_, bool has_wall_,
 BuildingType building_type_, CharacterType character_type_):
-    tile_type(tile_type_), owner_id(owner_id_), has_wall(has_wall_),
+    tile_type(tile_type_), owner_id(owner_id_), province_id(province_id_), has_wall(has_wall_),
     building_type(building_type_), character_type(character_type_)
 {}
 
 // The default Tile, used in map initialisation
 Tile Tile::default_Tile(){
-    return Tile(Ocean,-1,false,Wild,Empty);
+    return Tile(Ocean,0,0,false,Wild,Empty);
 }
 
 // Update the Tile parameters
