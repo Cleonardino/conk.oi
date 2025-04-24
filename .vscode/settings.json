@@ -47,7 +47,8 @@
         "typeinfo": "cpp",
         "fstream": "cpp",
         "map": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "optional": "cpp"
     },
     "makefile.configureOnOpen": false
 }
