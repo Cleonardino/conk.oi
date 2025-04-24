@@ -113,6 +113,10 @@ Map parse_csv(std::string filepath) {
                         // Knight
                         character_type = Knight;
                         break;
+                    case 'h':
+                        // Knight
+                        character_type = Hero;
+                        break;
                     default:
                         // Empty
                         character_type = Empty;

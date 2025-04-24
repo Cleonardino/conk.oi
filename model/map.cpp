@@ -106,7 +106,8 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
             os << "#";
             break;
         
-        default:
+        case Hero:
+            os << "@";
             break;
         }
 

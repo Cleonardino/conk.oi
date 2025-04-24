@@ -14,7 +14,8 @@ enum CharacterType {
     Empty,
     Peasant,
     Soldier,
-    Knight
+    Knight,
+    Hero
 };
 
 enum BuildingType {
@@ -23,6 +24,7 @@ enum BuildingType {
     Fortress
 };
 
+// A class that represent all the data associated with a tile.
 class Tile{
     private:
     TileType tile_type;
@@ -50,6 +52,7 @@ class Tile{
     friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
 };
 
+// A class that represents the matrix of Tiles that makes the map.
 class Map{
     private:
     std::vector<std::vector<Tile>> data;
