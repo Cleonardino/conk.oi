@@ -157,6 +157,16 @@ Map::Map(int height_, int width_):
 height(height_), width(width_), data(height_, std::vector<Tile>(width_, Tile::default_Tile()))
 {}
 
+// Get map height
+int Map::get_height() const{
+    return height;
+}
+
+// Get map width
+int Map::get_width() const{
+    return width;
+}
+
 // Get a Tile based on its coordinates
 Tile Map::get_Tile(coordinates location) const {
     return data[location.first][location.second];

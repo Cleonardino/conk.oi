@@ -76,6 +76,8 @@ class Map{
     public:
 
     Map(int height_, int width_);
+    int get_height() const;
+    int get_width() const;
     Tile get_Tile(coordinates location) const;
     void set_Tile(coordinates location, TileType tile_type, int owner_id,
         bool has_wall, BuildingType building_type, Character character);

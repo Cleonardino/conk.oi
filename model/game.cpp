@@ -23,9 +23,79 @@ TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool se
 tile(tile_),walls(walls_),selected(selected_),province_selected(province_selected_),valid_destination(valid_destination_)
 {}
 
+
+
 // Get all neighbours location. Only count lands as neighbors.
 std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
-    // To do
+    std::vector<coordinates> result;
+    // Tile on left
+    if(location.second > 0){
+        // Not on the left column
+        if(map.get_Tile(coordinates(location.first,location.second-1)).get_type() == Land){
+            // Adding tile on the left
+            result.push_back(coordinates(location.first,location.second-1));
+        }
+    }
+    // Tile on right
+    if(location.second < map.get_width() - 1){
+        // Not on the right column
+        if(map.get_Tile(coordinates(location.first,location.second+1)).get_type() == Land){
+            // Adding tile on the left
+            result.push_back(coordinates(location.first,location.second+1));
+        }
+    }
+
+    // Tile on top
+    if(location.first > 0){
+        // Not on the top row
+        if(map.get_Tile(coordinates(location.first-1,location.second)).get_type() == Land){
+            // Adding tile on the top
+            result.push_back(coordinates(location.first-1,location.second));
+        }
+        if(location.first % 2 == 0){
+            if(location.second > 0){
+            // Even row, check tile on the top left
+                if(map.get_Tile(coordinates(location.first-1,location.second-1)).get_type() == Land){
+                    // Adding tile on the top left
+                    result.push_back(coordinates(location.first-1,location.second-1));
+                }
+            }
+        }else{
+            if(location.second < map.get_width() - 1){
+            // Odd row, check tile on the top right
+                if(map.get_Tile(coordinates(location.first-1,location.second+1)).get_type() == Land){
+                    // Adding tile on the top right
+                    result.push_back(coordinates(location.first-1,location.second+1));
+                }
+            }
+        }
+    }
+    // Tile on bottom
+    if(location.first < map.get_height() - 1){
+        // Not on the bottom row
+        if(map.get_Tile(coordinates(location.first+1,location.second)).get_type() == Land){
+            // Adding tile on the bottom
+            result.push_back(coordinates(location.first+1,location.second));
+        }
+        if(location.first % 2 == 0){
+            if(location.second > 0){
+            // Even row, check tile on the bottom left
+                if(map.get_Tile(coordinates(location.first+1,location.second-1)).get_type() == Land){
+                    // Adding tile on the bottom left
+                    result.push_back(coordinates(location.first+1,location.second-1));
+                }
+            }
+        }else{
+            if(location.second < map.get_width() - 1){
+            // Odd row, check tile on the bottom right
+                if(map.get_Tile(coordinates(location.first+1,location.second+1)).get_type() == Land){
+                    // Adding tile on the bottom right
+                    result.push_back(coordinates(location.first+1,location.second+1));
+                }
+            }
+        }
+    }
+    return result;
 }
 
 // Compute provinces after a tile is changed
