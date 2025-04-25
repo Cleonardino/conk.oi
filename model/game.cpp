@@ -18,3 +18,8 @@ int Province::get_gold(){
 void Province::add_location(coordinates location){
     locations.push_back(location);
 }
+
+// Compute provinces after a tile is changed
+void Game::update_provinces(){
+    // Check for tiles that have an owner_id that don't match the province they belong to owner_id.
+}

@@ -22,11 +22,14 @@ class Province{
 
 // A class containing all the informations of the current game's state as well as the map.
 class Game{
+    private:
     Map map;
     int active_player_id;
     std::vector<Province> provinces;
     coordinates selected_location;
     
+    public:
+    void update_provinces();
 };
 
 #endif
