@@ -20,6 +20,15 @@ class Province{
 
 };
 
+// A class containing all processed data of a tile that is needed to display it.
+class TileInfos{
+    private:
+    Tile tile;
+    std::vector<bool> walls;
+    std::vector<bool> selected;
+    bool valid_destination;
+};
+
 // A class containing all the informations of the current game's state as well as the map.
 class Game{
     private:
@@ -30,6 +39,7 @@ class Game{
     
     public:
     void update_provinces();
+
 };
 
 #endif
