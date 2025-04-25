@@ -23,13 +23,14 @@ TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool se
 tile(tile_),walls(walls_),selected(selected_),province_selected(province_selected_),valid_destination(valid_destination_)
 {}
 
-// Get all neighbours location. If neighbour does not exist or is not a land, the coordinates will be (-1,-1)
+// Get all neighbours location. Only count lands as neighbors.
 std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
     // To do
 }
 
 // Compute provinces after a tile is changed
 void Game::update_provinces(){
+    // Reset province
     // Flood province
     // All tiles in a list
     // Take first tile, erase it from list and mark it with an id. Repeat for all neighbors

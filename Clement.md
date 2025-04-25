@@ -8,3 +8,5 @@ Functions :
 Game::get_neighbours_locations
 Game::update_provinces
 Game::get_display_infos
+
+Used sprites : ZZZZZ (sleeping)
