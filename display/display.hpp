@@ -4,6 +4,7 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <vector>
+#include <map>
 
 class Display {
     private:
@@ -11,7 +12,8 @@ class Display {
         bool isRunning;
         SDL_Window *window;
         SDL_Renderer *renderer;
-        int map[20][20];
+        SDL_Rect src, dest;
+        std::map<int, SDL_Texture*> textures;
     public:
     Display();
     ~Display();
@@ -23,6 +25,9 @@ class Display {
     void render();
     void clean();
     void DrawMap();
+    void DrawButton();
+    bool InTile(SDL_Rect dest);
+    SDL_Rect InMap(int posx, int posy, int* mat_row, int* mat_col);
     bool running() { return isRunning; }
 
 };
