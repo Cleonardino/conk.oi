@@ -1,6 +1,20 @@
 #include "game.hpp"
 
 Province::Province(std::string name_, int owner_id_):
-coordinates(std::vector<std::pair<int,int>>(0,std::pair<int,int>(-1,-1))),
-name(name_), owner_id(owner_id_), gold(0)
+locations(std::vector<coordinates>(0,coordinates(-1,-1))),
+owner_id(owner_id_), gold(0)
 {}
+
+// Add the amount gold to the province (can be negative)
+int Province::add_gold(int amount){
+    gold += amount;
+    return gold;
+}
+
+int Province::get_gold(){
+    return gold;
+}
+
+void Province::add_location(coordinates location){
+    locations.push_back(location);
+}

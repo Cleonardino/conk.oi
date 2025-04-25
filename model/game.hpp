@@ -5,10 +5,10 @@
 #include "map.hpp"
 #include "parser.hpp"
 
-// A class consisting of a collection of tiles coordinates, and all informations relevant to a province.
+// A class consisting of a collection of tiles locations, and all informations relevant to a province.
 class Province{
     private:
-    std::vector<std::pair<int, int>> coordinates;
+    std::vector<coordinates> locations;
     int owner_id;
     int gold;
 
@@ -16,6 +16,8 @@ class Province{
     Province(std::string name_, int owner_id);
     int add_gold(int amount);
     int get_gold();
+    void add_location(coordinates location);
+
 };
 
 // A class containing all the informations of the current game's state as well as the map.
@@ -23,7 +25,7 @@ class Game{
     Map map;
     int active_player_id;
     std::vector<Province> provinces;
-    std::pair<int, int> selected_coordinates;
+    coordinates selected_location;
     
 };
 

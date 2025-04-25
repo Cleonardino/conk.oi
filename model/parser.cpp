@@ -126,9 +126,9 @@ Map parse_csv(std::string filepath) {
                 }
 
                 // Update tile
-                result.set_Tile(cur_row, cur_column, tile_type, owner_id,
+                result.set_Tile(coordinates(cur_row, cur_column), tile_type, owner_id,
                     has_wall, building_type, character_type);
-                std::cout << cur_row << "x" << cur_column << " -> Type:" << tile_type << " Owner:" << owner_id << std::endl;
+                    
                 cur_column++;
             }
             cur_row++;
