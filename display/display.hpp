@@ -26,8 +26,9 @@ class Display {
     void clean();
     void DrawMap();
     void DrawButton();
-    bool InTile(SDL_Rect dest);
-    SDL_Rect InMap(int posx, int posy, int* mat_row, int* mat_col);
+    bool InButton(int posx, int posy, int *button_id);
+    bool InTile(SDL_Rect dest, int posx_mouse, int posy_mouse);
+    bool InMap(int posx, int posy, int* mat_row, int* mat_col);
     bool running() { return isRunning; }
 
 };
