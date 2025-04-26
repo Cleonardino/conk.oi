@@ -101,6 +101,7 @@ std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
 // Compute provinces after a tile is changed
 void Game::update_provinces(){
     // Reset province
+    // Check for strayed units and turn them into bandits
     // Flood province
     // All tiles in a list
     // Take first tile, erase it from list and mark it with an id. Repeat for all neighbors

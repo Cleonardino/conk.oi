@@ -11,6 +11,7 @@ class Province{
     std::vector<coordinates> locations;
     int owner_id;
     int gold;
+    int income;
 
     public:
     Province(std::string name_, int owner_id);
