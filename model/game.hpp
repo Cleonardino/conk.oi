@@ -2,6 +2,8 @@
 #define GAME_HPP
 
 #include <iostream>
+#include <stack>
+#include <set>
 #include "map.hpp"
 #include "parser.hpp"
 
@@ -14,11 +16,15 @@ class Province{
     int income;
 
     public:
-    Province(std::string name_, int owner_id);
+    Province(int owner_id);
     int add_gold(int amount);
-    int get_gold();
+    int get_gold() const;
+    int get_owner() const;
+    int get_income() const;
+    std::vector<coordinates> get_locations() const;
     void add_location(coordinates location);
 
+    friend std::ostream& operator<<(std::ostream& os, const Province& province);
 };
 
 // A class containing all processed data of a tile that is needed to display it.
@@ -46,6 +52,9 @@ class Game{
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_);
     std::vector<coordinates> get_neighbours_locations(coordinates location);
     void update_provinces();
+    std::vector<Province> test(){
+        return provinces;
+    }
     TileDisplayInfos get_display_infos(coordinates location) const;
 
 };

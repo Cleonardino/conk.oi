@@ -1,8 +1,8 @@
 #include "game.hpp"
 
-Province::Province(std::string name_, int owner_id_):
-locations(std::vector<coordinates>(0,coordinates(-1,-1))),
-owner_id(owner_id_), gold(0)
+Province::Province(int owner_id_):
+locations(std::vector<coordinates>()),
+owner_id(owner_id_), gold(0), income(0)
 {}
 
 // Add the amount gold to the province (can be negative)
@@ -11,12 +11,34 @@ int Province::add_gold(int amount){
     return gold;
 }
 
-int Province::get_gold(){
+int Province::get_gold() const{
     return gold;
+}
+
+int Province::get_owner() const{
+    return owner_id;
+}
+
+int Province::get_income() const{
+    return income;
+}
+
+std::vector<coordinates> Province::get_locations() const{
+    return locations;
 }
 
 void Province::add_location(coordinates location){
     locations.push_back(location);
+    income++;
+}
+
+std::ostream& operator<<(std::ostream& os, const Province& province){
+    os << "Province (Owner:" << province.get_owner() << " Gold:" << province.get_gold();
+    os << " Income:" << province.get_income() << ")" << std::endl;
+    for(coordinates location : province.get_locations()){
+        os << location.first << "," << location.second << std::endl;
+    }
+    return os;
 }
 
 TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool selected_, bool province_selected_, bool valid_destination_):
@@ -103,11 +125,50 @@ std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
 
 // Compute provinces after a tile is changed
 void Game::update_provinces(){
-    // Reset province
+    // Reset provinces
+    provinces.clear();
+    
+    std::vector<coordinates> all_towns;
+    std::stack<coordinates> to_treat;
+    std::set<coordinates> treated;
+    // All tiles containing a town in a stack
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_building() == Town){
+                all_towns.push_back(coordinates(i,j));
+            }
+        }
+    }
+    int current_owner_id = -1;
+    int current_province_id = -1;
+    for(coordinates town_location : all_towns){
+        // Add town
+        to_treat.push(town_location);
+        if(treated.find(town_location) == treated.end()){
+            // Town isn't part of a province, create a new one with owner set to the town's owner
+            current_owner_id = map.get_Tile(coordinates(town_location)).get_owner();
+            provinces.push_back(Province(current_owner_id));
+            current_province_id ++;
+        }
+        // Finding connected component
+        while (!to_treat.empty()) {
+            coordinates current = to_treat.top();
+            to_treat.pop();
+            if(treated.find(current) == treated.end() && map.get_Tile(current).get_owner() == current_owner_id){
+                // If not already visited and with the same owner
+                treated.insert(current);
+                provinces[current_province_id].add_location(current);
+                std::cout << "Visiting: (" << current.first << ", " << current.second << ")\n";
+                std::vector<coordinates> neighbours = get_neighbours_locations(current);
+                for(coordinates neighbor : neighbours){
+                    if(treated.find(neighbor) == treated.end()){
+                        to_treat.push(neighbor);
+                    }
+                }
+            }
+        }
+    }
     // Check for strayed units and turn them into bandits
-    // Flood province
-    // All tiles in a list
-    // Take first tile, erase it from list and mark it with an id. Repeat for all neighbors
     // Next province id, next tile that is in list.
 }
 
@@ -128,6 +189,10 @@ int main(){
     std::vector<coordinates> test = new_game.get_neighbours_locations(coordinates(1,1));
     for(coordinates c : test){
         std::cout << c.first << "," << c.second << std::endl;
+    }
+    new_game.update_provinces();
+    for(Province t : new_game.test()){
+        std::cout << t;
     }
     return 0;
 }
