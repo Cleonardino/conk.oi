@@ -43,6 +43,7 @@ class Game{
     coordinates selected_location;
     
     public:
+    Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_);
     std::vector<coordinates> get_neighbours_locations(coordinates location);
     void update_provinces();
     TileDisplayInfos get_display_infos(coordinates location) const;

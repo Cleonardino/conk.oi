@@ -8,8 +8,8 @@ SRC = model/parser.cpp
 OBJS = $(SRC:.cpp=.o)
 
 # Default target
-parser: model/map.o model/parser.o
-	$(COMPILER) -o parser model/*.o $(FLAGS)
+game: model/map.o model/parser.o model/game.o
+	$(COMPILER) -o game model/*.o $(FLAGS)
 
 %.o: %.cpp
 	$(COMPILER) -o $@ -c $< $(FLAGS)

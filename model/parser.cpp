@@ -143,8 +143,8 @@ Map parse_csv(std::string filepath) {
 
 }
 
-int main(){
-    Map new_map = parse_csv("example_map.txt");
-    std::cout << new_map;
-    return 0;
-}
+// int main(){
+//     Map new_map = parse_csv("example_map.txt");
+//     std::cout << new_map;
+//     return 0;
+// }

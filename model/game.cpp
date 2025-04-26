@@ -23,7 +23,10 @@ TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool se
 tile(tile_),walls(walls_),selected(selected_),province_selected(province_selected_),valid_destination(valid_destination_)
 {}
 
-
+// Class constructor
+Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_):
+map(map_), active_player_id(active_player_id_), provinces(provinces_),selected_location(selected_location_)
+{}
 
 // Get all neighbours location. Only count lands as neighbors.
 std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
@@ -116,4 +119,15 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     bool valid_destination = false;
     // To complete
     return TileDisplayInfos(map.get_Tile(location), walls, selected, province_selected, valid_destination);
+}
+
+int main(){
+    Map new_map = parse_csv("example_map.txt");
+    std::cout << new_map;
+    Game new_game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
+    std::vector<coordinates> test = new_game.get_neighbours_locations(coordinates(1,1));
+    for(coordinates c : test){
+        std::cout << c.first << "," << c.second << std::endl;
+    }
+    return 0;
 }
