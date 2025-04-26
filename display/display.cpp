@@ -41,7 +41,10 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         isRunning = false;
     }
     textures[BASE_TILE] = TileManager::LoadTile(BASE_TILE, renderer);
-    textures[PLAYERS_TILES] = TileManager::LoadTileforPlayer(1, 10, renderer);
+    for (int i = 1; i < 10; i++)
+    {
+        textures[PLAYERS_TILES + i] = TileManager::LoadTileforPlayer(i, 10, renderer);
+    }
     textures[END_TURN_SIGN] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
 }
@@ -130,7 +133,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += HEXA_SIZE;
-            TextureManager::Draw(renderer, textures[PLAYERS_TILES], src, dest);
+            TextureManager::Draw(renderer, textures[PLAYERS_TILES + i%9 +1], src, dest);
         }
         dest.y += HEXA_SIZE * 19/32;
     }
