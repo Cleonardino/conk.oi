@@ -1,16 +1,15 @@
 #include "display.hpp"
 #include "texturemanager.hpp"
+#include "tilemanager.hpp"
+#include "constants.hpp"
 
 Display::Display(){}
 Display::~Display(){}
 
-#define HEXA_SIZE 32
+#define HEXA_SIZE 32 * 2
 #define BUTTON_X_SIZE 64 * 2
 #define BUTTON_Y_SIZE 32 * 2
 #define BUTTON_SPACE 256
-#define BASE_TILE 0
-#define END_TURN_SIGN 1
-#define REWIND_SIGN 2
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -41,9 +40,13 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     {
         isRunning = false;
     }
-    textures[BASE_TILE] = TextureManager::LoadTexture("../art/tiles/base_tile.png", renderer);
-    textures[END_TURN_SIGN] = TextureManager::LoadTexture("../art/tiles/end_turn_sign.png", renderer);
-    textures[REWIND_SIGN] = TextureManager::LoadTexture("../art/tiles/rewind_sign.png", renderer);
+    textures[BASE_TILE] = TileManager::LoadTile(BASE_TILE, renderer);
+    for (int i = 1; i < 10; i++)
+    {
+        textures[PLAYERS_TILES + i] = TileManager::LoadTileforPlayer(i, 10, renderer);
+    }
+    textures[END_TURN_SIGN] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
+    textures[REWIND_SIGN] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
 }
 
 void Display::handleEvents()
@@ -58,11 +61,29 @@ void Display::handleEvents()
             case SDL_MOUSEBUTTONDOWN:
                 int x;
                 int y;
+                int mat_i;
+                int mat_j;
+                int button_id;
                 Uint32 bitmark;
                 bitmark = SDL_GetMouseState(&x,&y);
                 if (SDL_BUTTON(bitmark) == 1)
                 {
-                    std::cout << "x: " << x << "y: " << y << std::endl;
+                    if(InButton(x,y,&button_id))
+                    {
+                        switch(button_id)
+                        {
+                            case REWIND_SIGN:
+                                std::cout << "Rewind sign clicked" << std::endl;
+                                break;
+                            case END_TURN_SIGN:
+                                std::cout << "End turn sign clicked" << std::endl;
+                                break;
+                        }
+                    }
+                    else if(InMap(x,y,&mat_i,&mat_j))
+                    {
+                        std::cout << "i: " << mat_i << " j: " << mat_j << std::endl;
+                    }
                 }
         }
     }
@@ -82,11 +103,12 @@ void Display::render()
 
 void Display::DrawMap()
 {
-    int map_row_size = 20;
-    int map_col_size = 20;
+    int map_row_size = 15;
+    int map_col_size = 15;
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
+    window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
     int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
     src.y = src.x = 0;
@@ -111,7 +133,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += HEXA_SIZE;
-            TextureManager::Draw(renderer, textures[BASE_TILE], src, dest);
+            TextureManager::Draw(renderer, textures[PLAYERS_TILES + i%9 +1], src, dest);
         }
         dest.y += HEXA_SIZE * 19/32;
     }
@@ -119,21 +141,23 @@ void Display::DrawMap()
 
 bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
 {
-    int map_row_size = 20;
-    int map_col_size = 20;
+    int map_row_size = 15;
+    int map_col_size = 15;
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
+    window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
     int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
+    SDL_Rect actuR;
     src.y = src.x = 0;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    src.w = dest.w = HEXA_SIZE;
-    src.h = dest.h = HEXA_SIZE;
+    src.w = dest.w = actuR.w = HEXA_SIZE;
+    src.h = dest.h = actuR.h =HEXA_SIZE;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
@@ -148,18 +172,49 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += HEXA_SIZE;
-            dest.x = dest.x - posx_mouse;
-            dest.y = dest.y - posy_mouse;
-            if (dest.x >= 0 and dest.x <= 31 and dest.y >= 0 and dest.y <= 31)
+            actuR.x = posx_mouse - dest.x;
+            actuR.y = posy_mouse - dest.y;
+            if (actuR.x >= 0 and actuR.x <= HEXA_SIZE - 1 and actuR.y >= 0 and actuR.y <= HEXA_SIZE - 1)
             {
-                if (InTile(dest))
+                if (InTile(dest, posx_mouse, posy_mouse))
                 {
-                    return 
+                    *mat_row = i;
+                    *mat_col = j;
+                    return true;
                 }
             }
         }
         dest.y += HEXA_SIZE * 19/32;
     }
+    return false;
+}
+
+bool Display::InTile(SDL_Rect dest, int posx_mouse, int posy_mouse)
+{
+    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(HEXA_SIZE); // X Mouse position in tile dest referential
+    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(HEXA_SIZE); // Y Mouse position in tile dest referential
+
+    if (mouse_y_in_tile >= 13 and mouse_y_in_tile <= 24 - 1) // Verification for center of the tile (base_tile dependant)
+    {
+        return true;
+    }
+    if ((mouse_x_in_tile + 1)/2 + mouse_y_in_tile >= 13 and mouse_x_in_tile < 16 and mouse_y_in_tile <= 13) // Verification for left-hupper corner of the tile (base_tile dependant)
+    {
+        return true;
+    }
+    if (-1 * (mouse_x_in_tile + 1)/2 + mouse_y_in_tile >= -3 and mouse_x_in_tile >= 16 and mouse_y_in_tile <= 13)  // Verification for right-hupper corner of the tile (base_tile dependant)
+    {
+        return true;
+    }
+    if ((mouse_x_in_tile + 1)/2 + mouse_y_in_tile <= (31 + 8) and mouse_x_in_tile >= 16 and mouse_y_in_tile >= 24 - 1)  // Verification for right-bottom corner of the tile (base_tile dependant)
+    {
+        return true;
+    }
+    if (-1 * (mouse_x_in_tile + 1)/2 + mouse_y_in_tile <= (-8 + 31) and mouse_x_in_tile < 16 and mouse_y_in_tile >= 24 - 1)  // Verification for left-bottom corner of the tile (base_tile dependant)
+    {
+        return true;
+    }
+    return false;
 }
 
 void Display::DrawButton()
@@ -177,26 +232,29 @@ void Display::DrawButton()
     TextureManager::Draw(renderer, textures[END_TURN_SIGN], src, dest);
 }
 
-bool Display::InTile(SDL_Rect dest)
+bool Display::InButton(int posx, int posy, int *button_id)
 {
-    if (dest.y >= 13 and dest.y <= 23)
+    int window_w;
+    int window_h;
+    SDL_Rect actuR;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    src.x = src.y = 0;
+    src.w = dest.w = actuR.w = BUTTON_X_SIZE;
+    src.h = dest.h = actuR.h = BUTTON_Y_SIZE;
+    dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
+    dest.y = window_h - BUTTON_Y_SIZE;
+    actuR.x = posx - dest.x;
+    actuR.y = posy - dest.y;
+    if(actuR.x >= 0 and actuR.x <= BUTTON_X_SIZE and actuR.y >= 0)
     {
+        *button_id = REWIND_SIGN;
         return true;
     }
-    if ((dest.x+1)/2 + dest.y >= 13 and dest.x <= 15 and dest.y <= 13)
+    dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
+    actuR.x = posx - dest.x;
+    if(actuR.x >= 0 and actuR.x <= BUTTON_X_SIZE and actuR.y >= 0)
     {
-        return true;
-    }
-    if ((-dest.x - 1)/2 + dest.y >= -3 and dest.x >= 16 and dest.y <= 13)
-    {
-        return true;
-    }
-    if ((dest.x+1)/2 + dest.y <= 31 + 16  and dest.x >= 16 and dest.y >= 23)
-    {
-        return true;
-    }
-    if ((-dest.x - 1)/2 + dest.y <= -8 + 31 and dest.x <= 15 and dest.y >= 23)
-    {
+        *button_id = END_TURN_SIGN;
         return true;
     }
     return false;
