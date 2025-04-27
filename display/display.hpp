@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "../model/map.hpp"
 
 class Display {
     private:
@@ -14,6 +15,8 @@ class Display {
         SDL_Renderer *renderer;
         SDL_Rect src, dest;
         std::map<int, SDL_Texture*> textures;
+        Game game;
+
     public:
     Display();
     ~Display();

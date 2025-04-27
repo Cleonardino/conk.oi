@@ -65,6 +65,8 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     }
     textures[END_TURN_SIGN] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
+    Map new_map = parse_csv("example_map.txt");
+    game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
 }
 
 void Display::handleEvents()
