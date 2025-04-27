@@ -26,7 +26,7 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, S
     {
         if(to_draw.get_walls()[i])
         {
-            TextureManager::Draw(renderer, textures[BARRIER_TILE_BL][0], src, dest);
+            TextureManager::Draw(renderer, textures[BARRIER_TILE_TL + i][0], src, dest);
         }
     }
     switch (to_draw.get_Tile().get_building().get_type())
@@ -64,7 +64,7 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, S
     {
         if(to_draw.get_walls()[i])
         {
-            TextureManager::Draw(renderer, textures[BARRIER_TILE_BL + i][0], src, dest);
+            TextureManager::Draw(renderer, textures[BARRIER_TILE_TL + i][0], src, dest);
         }
     }
 }
