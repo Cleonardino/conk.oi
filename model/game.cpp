@@ -37,10 +37,10 @@ void Province::add_location(coordinates location){
 }
 
 std::ostream& operator<<(std::ostream& os, const Province& province){
-    os << "Province (Owner:" << province.get_owner() << " Gold:" << province.get_gold();
-    os << " Income:" << province.get_income() << ")" << std::endl;
+    os << "==Province (Owner:" << province.get_owner() << " Gold:" << province.get_gold() <<
+    " Income:" << province.get_income() << ")" << std::endl;
     for(coordinates location : province.get_locations()){
-        os << location.first << "," << location.second << std::endl;
+        os << ">>" << location.first << "," << location.second << std::endl;
     }
     return os;
 }
@@ -189,7 +189,6 @@ void Game::update_provinces(){
                 // If not already visited and with the same owner
                 treated.insert(current);
                 provinces[current_province_id].add_location(current);
-                std::cout << "Visiting: (" << current.first << ", " << current.second << ")\n";
                 std::vector<coordinates> neighbours = get_neighbours_locations(current);
                 for(coordinates neighbor : neighbours){
                     if(treated.find(neighbor) == treated.end()){
@@ -226,6 +225,16 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     return TileDisplayInfos(map.get_Tile(location), walls, selected, province_selected, valid_destination);
 }
 
+std::ostream& operator<<(std::ostream& os, const Game& game){
+    os << "=====Game=====" << std::endl << "Selected Location: (" << game.selected_location.first <<
+    "," << game.selected_location.second << ")" <<
+    std::endl << game.map << std::endl << "===Provinces===" << std::endl;
+    for(Province province : game.provinces){
+        std::cout << province;
+    }
+    return os;
+}
+
 int main(){
     Map new_map = parse_csv("example_map.txt");
     std::cout << new_map;
@@ -234,9 +243,8 @@ int main(){
     for(coordinates c : test){
         std::cout << c.first << "," << c.second << std::endl;
     }
+    std::cout << new_game;
     new_game.update_provinces();
-    for(Province t : new_game.test()){
-        std::cout << t;
-    }
+    std::cout << new_game;
     return 0;
 }

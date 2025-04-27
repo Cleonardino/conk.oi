@@ -62,6 +62,7 @@ class Game{
     }
     TileDisplayInfos get_display_infos(coordinates location) const;
 
+    friend std::ostream& operator<<(std::ostream& os, const Game& game);
 };
 
 #endif
