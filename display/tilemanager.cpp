@@ -1,5 +1,71 @@
 #include "tilemanager.hpp"
 
+void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, SDL_Texture*> textures, SDL_Rect src, SDL_Rect dest, TileDisplayInfos to_draw, const int player_id)
+{
+    switch(to_draw.get_Tile().get_type())
+    {
+        case Ocean:
+            TextureManager::Draw(renderer, textures[OCEAN_TILE], src, dest);
+            break;
+        case Land:
+            TextureManager::Draw(renderer, textures[PLAYERS_TILES + player_id], src, dest);
+            break;
+        case Forest:
+            TextureManager::Draw(renderer, textures[FOREST_TILE], src, dest);
+            break;
+    }
+    if (to_draw.get_selected())
+    {
+        TextureManager::Draw(renderer, textures[SELECTED_TILE], src, dest);
+    }
+    else if(to_draw.get_province_selected())
+    {
+        TextureManager::Draw(renderer, textures[PROVINCE_SELECTED], src, dest);
+    }
+    for(int i = 0; i < 2; i++)
+    {
+        if(to_draw.get_walls()[i])
+        {
+            TextureManager::Draw(renderer, textures[BARRIER_TILE_BL + i], src, dest);
+        }
+    }
+    switch (to_draw.get_Tile().get_building().get_type())
+    {
+        case Wild:
+            break;
+        case Town:
+            TextureManager::Draw(renderer, textures[TOWN_TILE], src, dest);
+            break;
+        case Fortress:
+            TextureManager::Draw(renderer, textures[FORTRESS_TILE], src, dest);
+            break;
+    }
+    switch (to_draw.get_Tile().get_character().get_type())
+    {
+        case Empty:
+            break;
+        case Peasant:
+            TextureManager::Draw(renderer, textures[PEASANT_TILE], src, dest);
+            break;
+        case Soldier:
+            TextureManager::Draw(renderer, textures[SOLDIER_TILE], src, dest);
+            break;
+        case Knight:
+            TextureManager::Draw(renderer, textures[KNIGHT_TILE], src, dest);
+            break;
+        case Hero:
+            TextureManager::Draw(renderer, textures[HERO_TILE], src, dest);
+            break;
+    }
+    for(int i = 2; i < 6; i++)
+    {
+        if(to_draw.get_walls()[i])
+        {
+            TextureManager::Draw(renderer, textures[BARRIER_TILE_BL + i], src, dest);
+        }
+    }
+}
+
 SDL_Texture* TileManager::LoadTile(const int tile_id, SDL_Renderer* renderer)
 {
     std::map<int, const char*> id_to_tilename { {BASE_TILE, "../art/tiles/base_tile.png"},

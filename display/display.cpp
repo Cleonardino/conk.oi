@@ -41,6 +41,24 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         isRunning = false;
     }
     textures[BASE_TILE] = TileManager::LoadTile(BASE_TILE, renderer);
+    textures[FOREST_TILE] = TileManager::LoadTile(FOREST_TILE, renderer);
+    textures[OCEAN_TILE] = TileManager::LoadTile(OCEAN_TILE, renderer);
+    textures[CAMP_TILE] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer);
+    textures[FORTRESS_TILE] = TextureManager::LoadTexture("../art/tiles/fortress.png", renderer);
+    textures[PROVINCE_SELECTED] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
+    textures[SELECTED_TILE] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
+    textures[TOWN_TILE] = TextureManager::LoadTexture("../art/tiles/town.png", renderer);
+    textures[BARRIER_TILE_BL] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer);
+    textures[BARRIER_TILE_BR] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer);
+    textures[BARRIER_TILE_L] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer);
+    textures[BARRIER_TILE_R] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer);
+    textures[BARRIER_TILE_TL] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer);
+    textures[BARRIER_TILE_TR] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer);
+    textures[PEASANT_TILE] = TextureManager::LoadTexture("../art/characters/peasant.png", renderer);
+    textures[BANDIT_TILE] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
+    textures[HERO_TILE] = TextureManager::LoadTexture("../art/characters/hero.png", renderer);
+    textures[KNIGHT_TILE] = TextureManager::LoadTexture("../art/characters/knight.png", renderer);
+    textures[SOLDIER_TILE] = TextureManager::LoadTexture("../art/characters/soldier.png", renderer);
     for (int i = 1; i < 10; i++)
     {
         textures[PLAYERS_TILES + i] = TileManager::LoadTileforPlayer(i, 10, renderer);
