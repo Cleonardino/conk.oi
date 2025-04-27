@@ -246,16 +246,16 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
     return os;
 }
 
-int main(){
-    Map new_map = parse_csv("example_map.txt");
-    std::cout << new_map;
-    Game new_game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
-    std::vector<coordinates> test = new_game.get_neighbours_locations(coordinates(1,1));
-    for(coordinates c : test){
-        std::cout << c.first << "," << c.second << std::endl;
-    }
-    std::cout << new_game;
-    new_game.update_provinces();
-    std::cout << new_game;
-    return 0;
-}
+// int main(){
+//     Map new_map = parse_csv("example_map.txt");
+//     std::cout << new_map;
+//     Game new_game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
+//     std::vector<coordinates> test = new_game.get_neighbours_locations(coordinates(1,1));
+//     for(coordinates c : test){
+//         std::cout << c.first << "," << c.second << std::endl;
+//     }
+//     std::cout << new_game;
+//     new_game.update_provinces();
+//     std::cout << new_game;
+//     return 0;
+// }

@@ -1,7 +1,7 @@
 
 
 main:
-	g++ $$(sdl2-config --cflags) -o $@ main.cpp display.cpp texturemanager.cpp tilemanager.cpp $$(sdl2-config --libs) -lSDL2_image
+	g++ $$(sdl2-config --cflags) -o $@ main.cpp display.cpp texturemanager.cpp tilemanager.cpp ../model/game.cpp ../model/map.cpp ../model/parser.cpp $$(sdl2-config --libs) -lSDL2_image
 
 clean:
 	rm main

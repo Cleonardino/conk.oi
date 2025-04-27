@@ -40,31 +40,32 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     {
         isRunning = false;
     }
-    textures[BASE_TILE] = TileManager::LoadTile(BASE_TILE, renderer);
-    textures[FOREST_TILE] = TileManager::LoadTile(FOREST_TILE, renderer);
-    textures[OCEAN_TILE] = TileManager::LoadTile(OCEAN_TILE, renderer);
-    textures[CAMP_TILE] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer);
-    textures[FORTRESS_TILE] = TextureManager::LoadTexture("../art/tiles/fortress.png", renderer);
-    textures[PROVINCE_SELECTED] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
-    textures[SELECTED_TILE] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
-    textures[TOWN_TILE] = TextureManager::LoadTexture("../art/tiles/town.png", renderer);
-    textures[BARRIER_TILE_BL] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer);
-    textures[BARRIER_TILE_BR] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer);
-    textures[BARRIER_TILE_L] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer);
-    textures[BARRIER_TILE_R] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer);
-    textures[BARRIER_TILE_TL] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer);
-    textures[BARRIER_TILE_TR] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer);
-    textures[PEASANT_TILE] = TextureManager::LoadTexture("../art/characters/peasant.png", renderer);
-    textures[BANDIT_TILE] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
-    textures[HERO_TILE] = TextureManager::LoadTexture("../art/characters/hero.png", renderer);
-    textures[KNIGHT_TILE] = TextureManager::LoadTexture("../art/characters/knight.png", renderer);
-    textures[SOLDIER_TILE] = TextureManager::LoadTexture("../art/characters/soldier.png", renderer);
-    for (int i = 1; i < 10; i++)
+    textures[BASE_TILE][0] = TileManager::LoadTile(BASE_TILE, renderer);
+    textures[FOREST_TILE][0] = TileManager::LoadTile(FOREST_TILE, renderer);
+    textures[OCEAN_TILE][0] = TileManager::LoadTile(OCEAN_TILE, renderer);
+    textures[BARRIER_TILE_BL][0] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer);
+    textures[BARRIER_TILE_BR][0] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer);
+    textures[BARRIER_TILE_L][0] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer);
+    textures[BARRIER_TILE_R][0] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer);
+    textures[BARRIER_TILE_TL][0] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer);
+    textures[BARRIER_TILE_TR][0] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer);
+    textures[CAMP_TILE][0] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer);
+    textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
+    textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
+    textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
+    int nb_players = 5;
+    for (int i = 1; i < nb_players; i++)
     {
-        textures[PLAYERS_TILES + i] = TileManager::LoadTileforPlayer(i, 10, renderer);
+        textures[FORTRESS_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
+        textures[TOWN_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/town.png");
+        textures[PEASANT_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/peasant.png");
+        textures[HERO_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/hero.png");
+        textures[KNIGHT_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/knight.png");
+        textures[SOLDIER_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/soldier.png");
+        textures[PLAYERS_TILES][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer, "../art/tiles/land.png");
     }
-    textures[END_TURN_SIGN] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
-    textures[REWIND_SIGN] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
+    textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
+    textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
 }
 
 void Display::handleEvents()
@@ -121,8 +122,8 @@ void Display::render()
 
 void Display::DrawMap()
 {
-    int map_row_size = 15;
-    int map_col_size = 15;
+    int map_row_size = game.get_width();
+    int map_col_size = game.get_height();
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
@@ -151,7 +152,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += HEXA_SIZE;
-            TextureManager::Draw(renderer, textures[PLAYERS_TILES + i%9 +1], src, dest);
+            TileManager::DrawTile(renderer, textures, src, dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
         }
         dest.y += HEXA_SIZE * 19/32;
     }
@@ -159,8 +160,8 @@ void Display::DrawMap()
 
 bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
 {
-    int map_row_size = 15;
-    int map_col_size = 15;
+    int map_row_size = game.get_width();
+    int map_col_size = game.get_height();
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
@@ -245,9 +246,9 @@ void Display::DrawButton()
     src.h = dest.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
-    TextureManager::Draw(renderer, textures[REWIND_SIGN], src, dest);
+    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], src, dest);
     dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
-    TextureManager::Draw(renderer, textures[END_TURN_SIGN], src, dest);
+    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], src, dest);
 }
 
 bool Display::InButton(int posx, int posy, int *button_id)

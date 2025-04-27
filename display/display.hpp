@@ -14,7 +14,7 @@ class Display {
         SDL_Window *window;
         SDL_Renderer *renderer;
         SDL_Rect src, dest;
-        std::map<int, SDL_Texture*> textures;
+        std::map<int, std::map<int, SDL_Texture*>> textures;
         Game game;
     public:
     Display(Game game_);
