@@ -238,6 +238,5 @@ int main(){
     for(Province t : new_game.test()){
         std::cout << t;
     }
-    std::cout << new_game.map;
     return 0;
 }
