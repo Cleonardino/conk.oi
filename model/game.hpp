@@ -55,6 +55,8 @@ class Game{
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_);
+    int get_height() const;
+    int get_width() const;
     std::vector<coordinates> get_neighbours_locations(coordinates location);
     void update_provinces();
     std::vector<Province> test(){

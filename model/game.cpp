@@ -81,6 +81,17 @@ Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, co
 map(map_), active_player_id(active_player_id_), provinces(provinces_),selected_location(selected_location_)
 {}
 
+// Getter of game's map height
+int Game::get_height() const{
+    return map.get_height();
+}
+
+// Getter of game's map width
+int Game::get_width() const{
+    return map.get_width();
+}
+
+
 // Get all neighbours location. Only count lands as neighbors.
 std::vector<coordinates> Game::get_neighbours_locations(coordinates location){
     std::vector<coordinates> result;
