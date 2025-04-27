@@ -14,6 +14,7 @@ enum TileType {
 
 enum CharacterType {
     Empty,
+    Bandit,
     Peasant,
     Soldier,
     Knight,
@@ -26,7 +27,6 @@ class Character{
     bool has_moved;
 
     public:
-
     Character(CharacterType type_, bool has_moved_);
     CharacterType get_type() const;
     bool get_has_moved() const;
@@ -38,29 +38,40 @@ enum BuildingType {
     Fortress
 };
 
+class Building{
+    private:
+    BuildingType type;
+    int gold;
+
+    public:
+    Building(BuildingType type_);
+    BuildingType get_type() const;
+    int get_gold() const;
+};
+
 // A class that represent all the data associated with a tile.
 class Tile{
     private:
     TileType tile_type;
     int owner_id;
     bool has_wall;
-    BuildingType building_type;
+    Building building;
     Character character;
 
     public:
 
     Tile(TileType tile_type_, int owner_id_, bool has_wall_,
-        BuildingType building_type_, Character character_);
+        Building building_, Character character_);
 
     static Tile default_Tile();
 
     void update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
-        BuildingType building_type_, Character character_);
+        Building building_, Character character_);
 
     TileType get_type() const;
     int get_owner() const;
     bool get_wall() const;
-    BuildingType get_building() const;
+    Building get_building() const;
     Character get_character() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
@@ -80,7 +91,7 @@ class Map{
     int get_width() const;
     Tile get_Tile(coordinates location) const;
     void set_Tile(coordinates location, TileType tile_type, int owner_id,
-        bool has_wall, BuildingType building_type, Character character);
+        bool has_wall, Building building, Character character);
 
     friend std::ostream& operator<<(std::ostream& os, const Map& map);
 };

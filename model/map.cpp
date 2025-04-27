@@ -16,10 +16,25 @@ bool Character::get_has_moved() const {
 }
 
 // Class constructor
+Building::Building(BuildingType type_):
+type(type_),gold(0)
+{}
+
+// Retrn type of building
+BuildingType Building::get_type() const{
+    return type;
+}
+
+// Return gold in building
+int Building::get_gold() const{
+    return gold;
+}
+
+// Class constructor
 Tile::Tile(TileType tile_type_, int owner_id_, bool has_wall_,
-BuildingType building_type_, Character character_):
+Building building_, Character character_):
     tile_type(tile_type_), owner_id(owner_id_), has_wall(has_wall_),
-    building_type(building_type_), character(character_)
+    building(building_), character(character_)
 {}
 
 // The default Tile, used in map initialisation
@@ -29,11 +44,11 @@ Tile Tile::default_Tile(){
 
 // Update the Tile parameters
 void Tile::update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
-    BuildingType building_type_, Character character_){
+    Building building_, Character character_){
     tile_type = tile_type_;
     owner_id = owner_id_;
     has_wall = has_wall_;
-    building_type = building_type_;
+    building = building_;
     character = character_;
 }
 
@@ -47,8 +62,8 @@ int Tile::get_owner() const {
 bool Tile::get_wall() const {
     return has_wall;
 }
-BuildingType Tile::get_building() const {
-    return building_type;
+Building Tile::get_building() const {
+    return building;
 }
 Character Tile::get_character() const {
     return character;
@@ -109,6 +124,10 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
             os << " ";
             break;
         
+        case Bandit:
+            os << "x";
+            break;
+
         case Peasant:
             os << "-";
             break;
@@ -127,7 +146,7 @@ std::ostream& operator<<(std::ostream& os, const Tile& tile) {
         }
 
         // Print building
-        switch (tile.building_type)
+        switch (tile.building.get_type())
         {
         case Wild:
             os << " ";
@@ -174,8 +193,8 @@ Tile Map::get_Tile(coordinates location) const {
 
 // Set a Tile based on its coordinates
 void Map::set_Tile(coordinates location, TileType tile_type, int owner_id,
-    bool has_wall, BuildingType building_type, Character character){
-    data[location.first][location.second].update_tile(tile_type,owner_id,has_wall,building_type,character);
+    bool has_wall, Building building, Character character){
+    data[location.first][location.second].update_tile(tile_type,owner_id,has_wall,building,character);
 }
 
 // Used for debugging purpose and testing of game's logic

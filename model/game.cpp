@@ -11,18 +11,22 @@ int Province::add_gold(int amount){
     return gold;
 }
 
+// Getter method
 int Province::get_gold() const{
     return gold;
 }
 
+// Getter method
 int Province::get_owner() const{
     return owner_id;
 }
 
+// Getter method
 int Province::get_income() const{
     return income;
 }
 
+// Getter method
 std::vector<coordinates> Province::get_locations() const{
     return locations;
 }
@@ -41,9 +45,36 @@ std::ostream& operator<<(std::ostream& os, const Province& province){
     return os;
 }
 
+// Class constructor
 TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool selected_, bool province_selected_, bool valid_destination_):
 tile(tile_),walls(walls_),selected(selected_),province_selected(province_selected_),valid_destination(valid_destination_)
 {}
+
+// Getter method
+Tile TileDisplayInfos::get_Tile() const{
+    return tile;
+}
+
+// Getter method
+std::vector<bool> TileDisplayInfos::get_walls() const{
+    return walls;
+}
+
+// Getter method
+bool TileDisplayInfos::get_selected() const{
+    return selected;
+}
+
+// Getter method
+bool TileDisplayInfos::get_province_selected() const{
+    return province_selected;
+}
+
+// Getter method
+bool TileDisplayInfos::get_valid_destination() const{
+    return valid_destination;
+}
+
 
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_):
@@ -134,7 +165,7 @@ void Game::update_provinces(){
     // All tiles containing a town in a stack
     for(int i = 0; i < map.get_height(); i++){
         for(int j = 0; j < map.get_width(); j++){
-            if(map.get_Tile(coordinates(i,j)).get_building() == Town){
+            if(map.get_Tile(coordinates(i,j)).get_building().get_type() == Town){
                 all_towns.push_back(coordinates(i,j));
             }
         }
@@ -169,6 +200,19 @@ void Game::update_provinces(){
         }
     }
     // Check for strayed units and turn them into bandits
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &&
+            map.get_Tile(coordinates(i,j)).get_character().get_type() != Bandit){
+                // A standard unit is present, check if it's in a province
+                if(treated.find(coordinates(i,j)) == treated.end()){
+                    // Not treated -> not connected to a province
+                        map.set_Tile(coordinates(i,j),Land,map.get_Tile(coordinates(i,j)).get_owner(),
+                        false,Building(Wild),Character(Bandit,false));
+                }
+            }
+        }
+    }
     // Next province id, next tile that is in list.
 }
 
@@ -194,5 +238,6 @@ int main(){
     for(Province t : new_game.test()){
         std::cout << t;
     }
+    std::cout << new_game.map;
     return 0;
 }
