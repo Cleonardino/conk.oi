@@ -227,6 +227,10 @@ void Game::update_provinces(){
 }
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
+    std::cout << location.first << "," << location.second << "->" << adjacent_tile.first << "," << adjacent_tile.second <<
+    ":" << (map.get_Tile(adjacent_tile).get_wall() &&
+    map.get_Tile(adjacent_tile).get_owner() == 
+    map.get_Tile(location).get_owner()) << std::endl;
     return (map.get_Tile(adjacent_tile).get_wall() &&
     map.get_Tile(adjacent_tile).get_owner() == 
     map.get_Tile(location).get_owner());
@@ -242,39 +246,65 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     bool valid_destination = false;
 
     // Computing walls
-    // Wall on the left
-    // Tile on left
+    // Wall on left
     if(location.second > 0){
-        // Not on the left column
-        if(does_wall_connect(map,location,coordinates(location.first,location.second-1))){
-            // Adding tile on the left
-            walls[2] = false;
-        }
+        // Not on left column
+        walls[2] = walls[2] && !does_wall_connect(map,location,coordinates(location.first,location.second-1));
     }
-    // Tile on right
+
+    // Wall on right
     if(location.second < map.get_width() - 1){
-        // Not on the right column
-        if(does_wall_connect(map,location,coordinates(location.first,location.second+1))){
-            // Adding tile on the left
-            walls[3] = false;
+        // Not on right column
+        walls[3] = walls[3] && !does_wall_connect(map,location,coordinates(location.first,location.second+1));
+    }
+
+    if(location.first % 2 == 0){
+        // Even row
+        if(location.first > 0){
+            // Not on top row
+            if(location.second > 0){
+                // Not on left column
+                walls[0] = walls[0] && !does_wall_connect(map,location,coordinates(location.first-1,location.second-1));
+            }
+            walls[1] = walls[1] && !does_wall_connect(map,location,coordinates(location.first-1,location.second));
+        }
+        if(location.first < map.get_height() - 1){
+            // Not on the bottom row
+            if(location.second > 0){
+                // Not on left column
+                walls[4] = walls[4] && !does_wall_connect(map,location,coordinates(location.first+1,location.second-1));
+            }
+            walls[5] = walls[5] && !does_wall_connect(map,location,coordinates(location.first+1,location.second));
+        }
+    }else{
+        // Odd row
+        if(location.first > 0){
+            // Not on top row
+            if(location.second < map.get_width() - 1){
+                // Not on right column
+                walls[1] = walls[1] && !does_wall_connect(map,location,coordinates(location.first-1,location.second+1));
+            }
+            walls[0] = walls[0] && !does_wall_connect(map,location,coordinates(location.first-1,location.second));
+        }
+        if(location.first < map.get_height() - 1){
+            // Not on the bottom row
+            if(location.second < map.get_width() - 1){
+                // Not on right column
+                walls[5] = walls[5] && !does_wall_connect(map,location,coordinates(location.first+1,location.second+1));
+            }
+            walls[4] = walls[4] && !does_wall_connect(map,location,coordinates(location.first+1,location.second));
         }
     }
 
     // // Tile on top
-    // if(location.first > 0){
+    // 
     //     // Not on the top row
     //     if(map.get_Tile(coordinates(location.first-1,location.second)).get_type() == Land){
     //         // Adding tile on the top
     //         result.push_back(coordinates(location.first-1,location.second));
     //     }
     //     if(location.first % 2 == 0){
-    //         if(location.second > 0){
-    //         // Even row, check tile on the top left
-    //             if(map.get_Tile(coordinates(location.first-1,location.second-1)).get_type() == Land){
-    //                 // Adding tile on the top left
-    //                 result.push_back(coordinates(location.first-1,location.second-1));
-    //             }
-    //         }
+    //         
     //     }else{
     //         if(location.second < map.get_width() - 1){
     //         // Odd row, check tile on the top right
