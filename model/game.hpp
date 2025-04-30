@@ -63,7 +63,14 @@ class Game{
         return provinces;
     }
     TileDisplayInfos get_display_infos(coordinates location) const;
-
+    void on_tile_click(coordinates location);
+    void on_end_turn();
+    void on_rewind();
+    void on_peasant_purchase();
+    void on_soldier_purchase();
+    void on_knight_purchase();
+    void on_hero_purchase();
+    void on_fortress_purchase();
     friend std::ostream& operator<<(std::ostream& os, const Game& game);
 };
 
