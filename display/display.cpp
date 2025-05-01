@@ -7,8 +7,8 @@ Display::Display(Game game_): game(game_){}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
-#define BUTTON_X_SIZE 64 * 2
-#define BUTTON_Y_SIZE 32 * 2
+#define BUTTON_X_SIZE 64 * 1.5
+#define BUTTON_Y_SIZE 32 * 1.5
 #define BUTTON_SPACE 256
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
@@ -93,24 +93,23 @@ void Display::handleEvents()
                         switch(button_id)
                         {
                             case REWIND_SIGN:
-                                game.on_rewind();
+                                //game.on_rewind();
                                 break;
                             case END_TURN_SIGN:
-                                game.on_end_turn();
+                                //game.on_end_turn();
                                 break;
                         }
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
-                        game.on_tile_click(coordinates(mat_i, mat_j));
+                        //game.on_tile_click(coordinates(mat_i, mat_j));
                     }
                 }
                 break;
             case SDL_MOUSEWHEEL:
-                std::cout << "Scroll amount: " << event.wheel.y << '\n';
                 if (actu_hexa_size > 0 || (actu_hexa_size == 0 and event.wheel.y > 0))
                 {
-                    actu_hexa_size += event.wheel.y;
+                    actu_hexa_size += event.wheel.y * 2;
                 }
                 break;
             case SDL_KEYDOWN:
