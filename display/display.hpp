@@ -10,10 +10,12 @@
 class Display {
     private:
         int cmt = 0;
+        int actu_hexa_size;
         bool isRunning;
         SDL_Window *window;
         SDL_Renderer *renderer;
-        SDL_Rect src, dest;
+        SDL_Rect dest;
+        coordinates window_center = coordinates(0,0);
         std::map<int, std::map<int, SDL_Texture*>> textures;
         Game game;
     public:

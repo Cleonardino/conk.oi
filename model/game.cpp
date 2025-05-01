@@ -227,10 +227,10 @@ void Game::update_provinces(){
 }
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
-    std::cout << location.first << "," << location.second << "->" << adjacent_tile.first << "," << adjacent_tile.second <<
-    ":" << (map.get_Tile(adjacent_tile).get_wall() &&
-    map.get_Tile(adjacent_tile).get_owner() == 
-    map.get_Tile(location).get_owner()) << std::endl;
+    //std::cout << location.first << "," << location.second << "->" << adjacent_tile.first << "," << adjacent_tile.second <<
+    //":" << (map.get_Tile(adjacent_tile).get_wall() &&
+    //map.get_Tile(adjacent_tile).get_owner() == 
+    //map.get_Tile(location).get_owner()) << std::endl;
     return (map.get_Tile(adjacent_tile).get_wall() &&
     map.get_Tile(adjacent_tile).get_owner() == 
     map.get_Tile(location).get_owner());

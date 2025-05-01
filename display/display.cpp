@@ -7,13 +7,14 @@ Display::Display(Game game_): game(game_){}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
-#define BUTTON_X_SIZE 64 * 2
-#define BUTTON_Y_SIZE 32 * 2
+#define BUTTON_X_SIZE 64 * 1.5
+#define BUTTON_Y_SIZE 32 * 1.5
 #define BUTTON_SPACE 256
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
     int flags = 0;
+    actu_hexa_size = HEXA_SIZE;
     if(fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
@@ -28,7 +29,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         {
             std::cout << "Window created" << std::endl;
         }
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if(renderer)
         {
             SDL_SetRenderDrawColor(renderer, 50, 125, 160, 255);
@@ -92,18 +93,34 @@ void Display::handleEvents()
                         switch(button_id)
                         {
                             case REWIND_SIGN:
-                                std::cout << "Rewind sign clicked" << std::endl;
+                                game.on_rewind();
                                 break;
                             case END_TURN_SIGN:
-                                std::cout << "End turn sign clicked" << std::endl;
+                                game.on_end_turn();
                                 break;
                         }
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
-                        std::cout << "i: " << mat_i << " j: " << mat_j << std::endl;
+                        game.on_tile_click(coordinates(mat_i, mat_j));
                     }
                 }
+                break;
+            case SDL_MOUSEWHEEL:
+                if (actu_hexa_size > 0 || (actu_hexa_size == 0 and event.wheel.y > 0))
+                {
+                    actu_hexa_size += event.wheel.y * 2;
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_LEFT:  window_center.first -= 5; break;
+                    case SDLK_RIGHT: window_center.first += 5; break;
+                    case SDLK_UP:    window_center.second -= 5; break;
+                    case SDLK_DOWN:  window_center.second += 5; break;
+                }
+                break;
         }
     }
 }
@@ -128,33 +145,33 @@ void Display::DrawMap()
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
-    int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
-    int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
-    src.y = src.x = 0;
+    int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
+    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    src.w = dest.w = HEXA_SIZE;
-    src.h = dest.h = HEXA_SIZE;
+    dest.w = actu_hexa_size;
+    dest.h = actu_hexa_size;
+    dest.y += window_center.second;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
         {
-            dest.x = (window_w - map_w) / 2 - HEXA_SIZE;
+            dest.x = (window_w - map_w) / 2 - actu_hexa_size;
         }
         else
         {
-            dest.x = -HEXA_SIZE;
+            dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * HEXA_SIZE / 2;
+        dest.x += i%2 * actu_hexa_size / 2 + window_center.first;
         for(int j = 0; j<map_row_size;j++)
         {
-            dest.x += HEXA_SIZE;
-            TileManager::DrawTile(renderer, textures, src, dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
+            dest.x += actu_hexa_size;
+            TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
         }
-        dest.y += HEXA_SIZE * 19/32;
+        dest.y += actu_hexa_size * 19/32;
     }
 }
 
@@ -166,34 +183,33 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
-    int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
-    int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
+    int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
+    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
     SDL_Rect actuR;
-    src.y = src.x = 0;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    src.w = dest.w = actuR.w = HEXA_SIZE;
-    src.h = dest.h = actuR.h =HEXA_SIZE;
+    dest.w = actuR.w = actu_hexa_size;
+    dest.h = actuR.h = actu_hexa_size;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
         {
-            dest.x = (window_w - map_w) / 2 - HEXA_SIZE;
+            dest.x = (window_w - map_w) / 2 - actu_hexa_size;
         }
         else
         {
-            dest.x = -HEXA_SIZE;
+            dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * HEXA_SIZE / 2;
+        dest.x += i%2 * actu_hexa_size / 2;
         for(int j = 0; j<map_row_size;j++)
         {
-            dest.x += HEXA_SIZE;
+            dest.x += actu_hexa_size;
             actuR.x = posx_mouse - dest.x;
             actuR.y = posy_mouse - dest.y;
-            if (actuR.x >= 0 and actuR.x <= HEXA_SIZE - 1 and actuR.y >= 0 and actuR.y <= HEXA_SIZE - 1)
+            if (actuR.x >= 0 and actuR.x <= actu_hexa_size - 1 and actuR.y >= 0 and actuR.y <= actu_hexa_size - 1)
             {
                 if (InTile(dest, posx_mouse, posy_mouse))
                 {
@@ -203,15 +219,15 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
                 }
             }
         }
-        dest.y += HEXA_SIZE * 19/32;
+        dest.y += actu_hexa_size * 19/32;
     }
     return false;
 }
 
 bool Display::InTile(SDL_Rect dest, int posx_mouse, int posy_mouse)
 {
-    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(HEXA_SIZE); // X Mouse position in tile dest referential
-    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(HEXA_SIZE); // Y Mouse position in tile dest referential
+    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(actu_hexa_size); // X Mouse position in tile dest referential
+    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(actu_hexa_size); // Y Mouse position in tile dest referential
 
     if (mouse_y_in_tile >= 13 and mouse_y_in_tile <= 24 - 1) // Verification for center of the tile (base_tile dependant)
     {
@@ -241,14 +257,13 @@ void Display::DrawButton()
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
-    src.x = src.y = 0;
-    src.w = dest.w = BUTTON_X_SIZE;
-    src.h = dest.h = BUTTON_Y_SIZE;
+    dest.w = BUTTON_X_SIZE;
+    dest.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
-    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], src, dest);
+    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
     dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
-    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], src, dest);
+    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
 }
 
 bool Display::InButton(int posx, int posy, int *button_id)
@@ -257,9 +272,8 @@ bool Display::InButton(int posx, int posy, int *button_id)
     int window_h;
     SDL_Rect actuR;
     SDL_GetWindowSize(window, &window_w, &window_h);
-    src.x = src.y = 0;
-    src.w = dest.w = actuR.w = BUTTON_X_SIZE;
-    src.h = dest.h = actuR.h = BUTTON_Y_SIZE;
+    dest.w = actuR.w = BUTTON_X_SIZE;
+    dest.h = actuR.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
     actuR.x = posx - dest.x;
