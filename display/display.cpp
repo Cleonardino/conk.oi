@@ -93,16 +93,16 @@ void Display::handleEvents()
                         switch(button_id)
                         {
                             case REWIND_SIGN:
-                                //game.on_rewind();
+                                game.on_rewind();
                                 break;
                             case END_TURN_SIGN:
-                                //game.on_end_turn();
+                                game.on_end_turn();
                                 break;
                         }
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
-                        //game.on_tile_click(coordinates(mat_i, mat_j));
+                        game.on_tile_click(coordinates(mat_i, mat_j));
                     }
                 }
                 break;
