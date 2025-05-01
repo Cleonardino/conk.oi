@@ -83,8 +83,8 @@ bool TileDisplayInfos::get_valid_destination() const{
 }
 
 // Class constructor
-Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
-map(map_), active_player_id(active_player_id_), provinces(provinces_)
+Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, int max_player_count_):
+map(map_), active_player_id(active_player_id_), provinces(provinces_), max_player_count(max_player_count_)
 {
     selected_location = coordinates(-1,-1);
     update_select();
@@ -101,6 +101,10 @@ int Game::get_width() const{
     return map.get_width();
 }
 
+// Getter of max player count
+int Game::get_max_player_count() const{
+    return max_player_count;
+}
 
 // Get all neighbours location. Only count lands as neighbors.
 std::vector<coordinates> Game::get_neighbours_locations(coordinates location) const{

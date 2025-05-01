@@ -51,6 +51,7 @@ class Game{
     private:
     Map map;
     int active_player_id;
+    int max_player_count;
     std::vector<Province> provinces;
     coordinates selected_location;
     std::vector<std::vector<bool>> province_selected;
@@ -63,9 +64,10 @@ class Game{
     bool is_destination_valid(coordinates destination) const;
     
     public:
-    Game(Map map_, int active_player_id_, std::vector<Province> provinces_);
+    Game(Map map_, int active_player_id_, std::vector<Province> provinces_, int max_player_count);
     int get_height() const;
     int get_width() const;
+    int get_max_player_count() const;
     
     TileDisplayInfos get_display_infos(coordinates location) const;
     void on_tile_click(coordinates location);
