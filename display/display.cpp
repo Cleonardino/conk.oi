@@ -16,7 +16,6 @@ Display::~Display(){}
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
     int flags = 0;
-    actu_hexa_size = HEXA_SIZE;
     nowPlaying = false;
     if(fullscreen)
     {
@@ -39,6 +38,14 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
             std::cout << "Renderer created" << std::endl;
         }
         isRunning = true;
+        int map_row_size = game.get_width();
+        int map_col_size = game.get_height();
+        int window_w;
+        int window_h;
+        SDL_GetWindowSize(window, &window_w, &window_h);
+        window_h = window_h - BUTTON_Y_SIZE;
+        actu_hexa_size = std::min(window_w/(map_row_size+1/2), window_h/map_col_size * 32/19);
+        std::cout << actu_hexa_size << std::endl;
     }
     else
     {
@@ -71,6 +78,8 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
     textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
+    textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
+    textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
 }
 
 void Display::handleEvents()
@@ -161,7 +170,7 @@ void Display::DrawMap()
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
-    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
+    int map_h = map_col_size * actu_hexa_size * 19/32;
     dest.y = 0;
     if (window_h > map_h)
     {
@@ -208,6 +217,7 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     }
     dest.w = actuR.w = actu_hexa_size;
     dest.h = actuR.h = actu_hexa_size;
+    dest.y += window_center.second;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
@@ -218,7 +228,7 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
         {
             dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * actu_hexa_size / 2;
+        dest.x += i%2 * actu_hexa_size / 2 + window_center.first;
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += actu_hexa_size;
