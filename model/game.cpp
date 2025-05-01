@@ -319,8 +319,10 @@ bool Game::is_destination_valid(coordinates destination) const{
     // To complete
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
         // Same owner
+        std::cout << "no:" << destination.first << "," << destination.second << std::endl;
         return false;
     }
+    std::cout << "yes:" << destination.first << "," << destination.second << std::endl;
     return true;
 }
 
