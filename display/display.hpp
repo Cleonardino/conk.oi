@@ -10,6 +10,7 @@
 class Display {
     private:
         int cmt = 0;
+        int actu_hexa_size;
         bool isRunning;
         SDL_Window *window;
         SDL_Renderer *renderer;

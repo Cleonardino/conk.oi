@@ -14,6 +14,7 @@ Display::~Display(){}
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
     int flags = 0;
+    actu_hexa_size = HEXA_SIZE;
     if(fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
@@ -105,6 +106,9 @@ void Display::handleEvents()
                     }
                 }
                 break;
+            case SDL_MOUSEWHEEL:
+                std::cout << "Scroll amount: " << event.wheel.y << '\n';
+                break;
         }
     }
 }
@@ -129,32 +133,32 @@ void Display::DrawMap()
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
-    int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
-    int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
+    int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
+    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    dest.w = HEXA_SIZE;
-    dest.h = HEXA_SIZE;
+    dest.w = actu_hexa_size;
+    dest.h = actu_hexa_size;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
         {
-            dest.x = (window_w - map_w) / 2 - HEXA_SIZE;
+            dest.x = (window_w - map_w) / 2 - actu_hexa_size;
         }
         else
         {
-            dest.x = -HEXA_SIZE;
+            dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * HEXA_SIZE / 2;
+        dest.x += i%2 * actu_hexa_size / 2;
         for(int j = 0; j<map_row_size;j++)
         {
-            dest.x += HEXA_SIZE;
+            dest.x += actu_hexa_size;
             TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
         }
-        dest.y += HEXA_SIZE * 19/32;
+        dest.y += actu_hexa_size * 19/32;
     }
 }
 
@@ -166,33 +170,33 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
-    int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
-    int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
+    int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
+    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
     SDL_Rect actuR;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    dest.w = actuR.w = HEXA_SIZE;
-    dest.h = actuR.h =HEXA_SIZE;
+    dest.w = actuR.w = actu_hexa_size;
+    dest.h = actuR.h = actu_hexa_size;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
         {
-            dest.x = (window_w - map_w) / 2 - HEXA_SIZE;
+            dest.x = (window_w - map_w) / 2 - actu_hexa_size;
         }
         else
         {
-            dest.x = -HEXA_SIZE;
+            dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * HEXA_SIZE / 2;
+        dest.x += i%2 * actu_hexa_size / 2;
         for(int j = 0; j<map_row_size;j++)
         {
-            dest.x += HEXA_SIZE;
+            dest.x += actu_hexa_size;
             actuR.x = posx_mouse - dest.x;
             actuR.y = posy_mouse - dest.y;
-            if (actuR.x >= 0 and actuR.x <= HEXA_SIZE - 1 and actuR.y >= 0 and actuR.y <= HEXA_SIZE - 1)
+            if (actuR.x >= 0 and actuR.x <= actu_hexa_size - 1 and actuR.y >= 0 and actuR.y <= actu_hexa_size - 1)
             {
                 if (InTile(dest, posx_mouse, posy_mouse))
                 {
@@ -202,15 +206,15 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
                 }
             }
         }
-        dest.y += HEXA_SIZE * 19/32;
+        dest.y += actu_hexa_size * 19/32;
     }
     return false;
 }
 
 bool Display::InTile(SDL_Rect dest, int posx_mouse, int posy_mouse)
 {
-    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(HEXA_SIZE); // X Mouse position in tile dest referential
-    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(HEXA_SIZE); // Y Mouse position in tile dest referential
+    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(actu_hexa_size); // X Mouse position in tile dest referential
+    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(actu_hexa_size); // Y Mouse position in tile dest referential
 
     if (mouse_y_in_tile >= 13 and mouse_y_in_tile <= 24 - 1) // Verification for center of the tile (base_tile dependant)
     {
