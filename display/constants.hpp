@@ -20,3 +20,4 @@
 #define BARRIER_TILE_BL 19
 #define BARRIER_TILE_BR 20
 #define PLAYERS_TILES 21
+#define PLAY_BUTTON 22
