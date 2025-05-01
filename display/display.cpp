@@ -123,10 +123,10 @@ void Display::handleEvents()
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_LEFT:  window_center.first -= 5; break;
-                    case SDLK_RIGHT: window_center.first += 5; break;
-                    case SDLK_UP:    window_center.second -= 5; break;
-                    case SDLK_DOWN:  window_center.second += 5; break;
+                    case SDLK_LEFT:  window_center.first += 5; break;
+                    case SDLK_RIGHT: window_center.first -= 5; break;
+                    case SDLK_UP:    window_center.second += 5; break;
+                    case SDLK_DOWN:  window_center.second -= 5; break;
                 }
                 break;
         }
