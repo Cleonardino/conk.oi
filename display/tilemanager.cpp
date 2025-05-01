@@ -22,6 +22,10 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, S
     {
         TextureManager::Draw(renderer, textures[PROVINCE_SELECTED][0], dest);
     }
+    if(to_draw.get_valid_destination())
+    {
+        TextureManager::Draw(renderer, textures[VALID_DESTINATION][0], dest);
+    }
     for(int i = 0; i < 2; i++)
     {
         if(to_draw.get_walls()[i])
@@ -59,6 +63,10 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, S
         case Hero:
             TextureManager::Draw(renderer, textures[HERO_TILE][player_id], dest);
             break;
+    }
+    if (to_draw.get_Tile().get_character().get_has_moved())
+    {
+        TextureManager::Draw(renderer, textures[SLEEPING_CHAR][0], dest);
     }
     for(int i = 2; i < 6; i++)
     {
