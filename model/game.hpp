@@ -10,7 +10,7 @@
 // A class consisting of a collection of tiles locations, and all informations relevant to a province.
 class Province{
     private:
-    std::vector<coordinates> locations;
+    std::set<coordinates> locations;
     int owner_id;
     int gold;
     int income;
@@ -21,7 +21,8 @@ class Province{
     int get_gold() const;
     int get_owner() const;
     int get_income() const;
-    std::vector<coordinates> get_locations() const;
+    std::set<coordinates> get_locations() const;
+    bool does_contain(coordinates location) const;
     void add_location(coordinates location);
 
     friend std::ostream& operator<<(std::ostream& os, const Province& province);
@@ -54,16 +55,18 @@ class Game{
     coordinates selected_location;
     std::vector<std::vector<bool>> province_selected;
     std::vector<std::vector<bool>> valid_destination;
+
+    private:
+    void update_provinces();
+    void update_select();
+    std::vector<coordinates> get_neighbours_locations(coordinates location) const;
+    bool is_destination_valid(coordinates destination) const;
     
     public:
-    Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_);
+    Game(Map map_, int active_player_id_, std::vector<Province> provinces_);
     int get_height() const;
     int get_width() const;
-    std::vector<coordinates> get_neighbours_locations(coordinates location);
-    void update_provinces();
-    std::vector<Province> test(){
-        return provinces;
-    }
+    
     TileDisplayInfos get_display_infos(coordinates location) const;
     void on_tile_click(coordinates location);
     void on_end_turn();

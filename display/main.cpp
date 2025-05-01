@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     Map new_map = parse_csv("../example_map.txt");
-    Game new_game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
+    Game new_game = Game(new_map,0,std::vector<Province>());
     Display display = Display(new_game);
 
     const int FPS = 20;
