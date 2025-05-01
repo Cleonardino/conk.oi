@@ -9,12 +9,15 @@ Display::~Display(){}
 #define HEXA_SIZE 32 * 2
 #define BUTTON_X_SIZE 64 * 1.5
 #define BUTTON_Y_SIZE 32 * 1.5
+#define PLAY_X_SIZE 64
+#define PLAY_Y_SIZE 32
 #define BUTTON_SPACE 256
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
     int flags = 0;
     actu_hexa_size = HEXA_SIZE;
+    nowPlaying = false;
     if(fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
@@ -67,6 +70,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     }
     textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
+    textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
 }
 
 void Display::handleEvents()
@@ -93,16 +97,20 @@ void Display::handleEvents()
                         switch(button_id)
                         {
                             case REWIND_SIGN:
-                                game.on_rewind();
+                                //game.on_rewind();
                                 break;
                             case END_TURN_SIGN:
-                                game.on_end_turn();
+                                //game.on_end_turn();
                                 break;
                         }
                     }
+                    else if (InPlay(x, y))
+                    {
+                        nowPlaying = true;
+                    }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
-                        game.on_tile_click(coordinates(mat_i, mat_j));
+                        //game.on_tile_click(coordinates(mat_i, mat_j));
                     }
                 }
                 break;
@@ -132,8 +140,15 @@ void Display::update()
 void Display::render()
 {
     SDL_RenderClear(renderer);
-    this->DrawMap();
-    this->DrawButton();
+    if (nowPlaying)
+    {
+        this->DrawMap();
+        this->DrawButton();
+    }
+    else
+    {
+        this->DrawPlay();
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -288,6 +303,34 @@ bool Display::InButton(int posx, int posy, int *button_id)
     if(actuR.x >= 0 and actuR.x <= BUTTON_X_SIZE and actuR.y >= 0)
     {
         *button_id = END_TURN_SIGN;
+        return true;
+    }
+    return false;
+}
+
+void Display::DrawPlay()
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = PLAY_X_SIZE * 5;
+    dest.h = PLAY_Y_SIZE * 5;
+    dest.x = window_w/2 - dest.w/2;
+    dest.y = window_h/2 - dest.h/2;
+    TextureManager::Draw(renderer, textures[PLAY_BUTTON][0], &dest);
+}
+
+bool Display::InPlay(int posx, int posy)
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = PLAY_X_SIZE * 5;
+    dest.h = PLAY_Y_SIZE * 5;
+    dest.x = window_w/2 - dest.w/2;
+    dest.y = window_h/2 - dest.h/2;
+    if (posx - dest.x >= 0 and posx - dest.x <= dest.w and posy - dest.y >= 0 and posy - dest.y <= dest.h)
+    {
         return true;
     }
     return false;

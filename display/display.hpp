@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "../model/game.hpp"
 
 class Display {
@@ -12,6 +13,7 @@ class Display {
         int cmt = 0;
         int actu_hexa_size;
         bool isRunning;
+        bool nowPlaying;
         SDL_Window *window;
         SDL_Renderer *renderer;
         SDL_Rect dest;
@@ -30,6 +32,8 @@ class Display {
     void clean();
     void DrawMap();
     void DrawButton();
+    void DrawPlay();
+    bool InPlay(int posx, int posy);
     bool InButton(int posx, int posy, int *button_id);
     bool InTile(SDL_Rect dest, int posx_mouse, int posy_mouse);
     bool InMap(int posx, int posy, int* mat_row, int* mat_col);
