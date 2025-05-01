@@ -220,19 +220,19 @@ void Game::update_provinces(){
         }
     }
     // Check for strayed units and turn them into bandits
-    for(int i = 0; i < map.get_height(); i++){
-        for(int j = 0; j < map.get_width(); j++){
-            if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &&
-            map.get_Tile(coordinates(i,j)).get_character().get_type() != Bandit){
-                // A standard unit is present, check if it's in a province
-                if(treated.find(coordinates(i,j)) == treated.end()){
-                    // Not treated -> not connected to a province
-                        map.set_Tile(coordinates(i,j),Land,map.get_Tile(coordinates(i,j)).get_owner(),
-                        false,Building(Wild),Character(Bandit,false));
-                }
-            }
-        }
-    }
+    // for(int i = 0; i < map.get_height(); i++){
+    //     for(int j = 0; j < map.get_width(); j++){
+    //         if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &&
+    //         map.get_Tile(coordinates(i,j)).get_character().get_type() != Bandit){
+    //             // A standard unit is present, check if it's in a province
+    //             if(treated.find(coordinates(i,j)) == treated.end()){
+    //                 // Not treated -> not connected to a province
+    //                     map.set_Tile(coordinates(i,j),Land,map.get_Tile(coordinates(i,j)).get_owner(),
+    //                     false,Building(Wild),Character(Bandit,false));
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
@@ -246,9 +246,9 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     // List of walls in the following order : {TL,TR,L,R,BL,BR}
     // Init wall list with has_wall value
     std::vector<bool> walls = std::vector<bool>(6,map.get_Tile(location).get_wall());
-    bool selected = (location.first==selected_location.first && location.second == selected_location.second);
-    bool province_selected = false;
-    bool valid_destination = false;
+    bool selected = (location==selected_location);
+    bool is_province_selected = province_selected[location.first][location.second];
+    bool is_valid_destination = valid_destination[location.first][location.second];
 
     // Computing walls
     // Wall on left
@@ -302,7 +302,7 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     }
 
     // To complete
-    return TileDisplayInfos(map.get_Tile(location), walls, selected, province_selected, valid_destination);
+    return TileDisplayInfos(map.get_Tile(location), walls, selected, is_province_selected, is_valid_destination);
 }
 
 std::ostream& operator<<(std::ostream& os, const Game& game){
@@ -351,11 +351,14 @@ void Game::update_select(){
 }
 
 void Game::on_tile_click(coordinates location){
-    std::cout << location.first << "," << location.second << std::endl;
-    // selected_location.first = location.first;
-    // selected_location.second = location.second;
-    // std::cout << selected_location.first << "," << selected_location.second << std::endl;
-    // update_select();
+    if(location == selected_location){
+        // Only Unselect
+        selected_location = coordinates(-1,-1);
+        update_select();
+        return;
+    }
+    selected_location = location;
+    update_select();
 }
 
 void Game::on_end_turn(){
