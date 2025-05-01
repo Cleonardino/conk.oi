@@ -322,6 +322,10 @@ void Display::DrawPlay()
 
 bool Display::InPlay(int posx, int posy)
 {
+    if (nowPlaying)
+    {
+        return false;
+    }
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
