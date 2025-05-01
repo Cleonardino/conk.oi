@@ -92,16 +92,16 @@ void Display::handleEvents()
                         switch(button_id)
                         {
                             case REWIND_SIGN:
-                                std::cout << "Rewind sign clicked" << std::endl;
+                                game.on_rewind();
                                 break;
                             case END_TURN_SIGN:
-                                std::cout << "End turn sign clicked" << std::endl;
+                                game.on_end_turn();
                                 break;
                         }
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
-                        std::cout << "i: " << mat_i << " j: " << mat_j << std::endl;
+                        game.on_tile_click(coordinates(mat_i, mat_j));
                     }
                 }
                 break;
