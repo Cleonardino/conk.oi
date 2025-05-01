@@ -7,11 +7,12 @@ Display::Display(Game game_): game(game_){}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
-#define BUTTON_X_SIZE 64 * 1.5
-#define BUTTON_Y_SIZE 32 * 1.5
+#define BUTTON_X_SIZE 64 * 2
+#define BUTTON_Y_SIZE 32 * 2
 #define PLAY_X_SIZE 64
 #define PLAY_Y_SIZE 32
-#define BUTTON_SPACE 256
+#define BUTTON_SPACE 256 * 2
+#define PROVINCE_PANEL_SIZE 192 * 2
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -44,7 +45,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         int window_h;
         SDL_GetWindowSize(window, &window_w, &window_h);
         window_h = window_h - BUTTON_Y_SIZE;
-        actu_hexa_size = std::min(window_w/(map_row_size+1/2), window_h/map_col_size * 32/19);
+        actu_hexa_size = std::min(window_w/(map_row_size+1), window_h/map_col_size * 32/19);
         std::cout << actu_hexa_size << std::endl;
     }
     else
@@ -64,7 +65,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
     textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
     textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
-    int nb_players = 5;
+    int nb_players = game.get_max_player_count();
     for (int i = 1; i < nb_players; i++)
     {
         textures[FORTRESS_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
@@ -80,6 +81,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
     textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
     textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
+    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
 }
 
 void Display::handleEvents()
@@ -287,7 +289,11 @@ void Display::DrawButton()
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
     TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
-    dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
+    dest.x += BUTTON_X_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
+    dest.w = PROVINCE_PANEL_SIZE;
+    TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
+    dest.w = BUTTON_X_SIZE;
+    dest.x += PROVINCE_PANEL_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
 }
 
