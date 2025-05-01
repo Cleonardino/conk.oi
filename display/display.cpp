@@ -108,6 +108,19 @@ void Display::handleEvents()
                 break;
             case SDL_MOUSEWHEEL:
                 std::cout << "Scroll amount: " << event.wheel.y << '\n';
+                if (actu_hexa_size > 0 || (actu_hexa_size == 0 and event.wheel.y > 0))
+                {
+                    actu_hexa_size += event.wheel.y;
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_LEFT:  window_center.first -= 5; break;
+                    case SDLK_RIGHT: window_center.first += 5; break;
+                    case SDLK_UP:    window_center.second -= 5; break;
+                    case SDLK_DOWN:  window_center.second += 5; break;
+                }
                 break;
         }
     }
@@ -142,6 +155,7 @@ void Display::DrawMap()
     }
     dest.w = actu_hexa_size;
     dest.h = actu_hexa_size;
+    dest.y += window_center.second;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
@@ -152,7 +166,7 @@ void Display::DrawMap()
         {
             dest.x = -actu_hexa_size;
         }
-        dest.x += i%2 * actu_hexa_size / 2;
+        dest.x += i%2 * actu_hexa_size / 2 + window_center.first;
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += actu_hexa_size;

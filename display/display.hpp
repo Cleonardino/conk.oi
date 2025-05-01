@@ -15,6 +15,7 @@ class Display {
         SDL_Window *window;
         SDL_Renderer *renderer;
         SDL_Rect dest;
+        coordinates window_center = coordinates(0,0);
         std::map<int, std::map<int, SDL_Texture*>> textures;
         Game game;
     public:
