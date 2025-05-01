@@ -52,6 +52,8 @@ class Game{
     int active_player_id;
     std::vector<Province> provinces;
     coordinates selected_location;
+    std::vector<std::vector<bool>> province_selected;
+    std::vector<std::vector<bool>> valid_destination;
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_);

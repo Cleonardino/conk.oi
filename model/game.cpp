@@ -75,7 +75,6 @@ bool TileDisplayInfos::get_valid_destination() const{
     return valid_destination;
 }
 
-
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, coordinates selected_location_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_),selected_location(selected_location_)
@@ -227,10 +226,6 @@ void Game::update_provinces(){
 }
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
-    //std::cout << location.first << "," << location.second << "->" << adjacent_tile.first << "," << adjacent_tile.second <<
-    //":" << (map.get_Tile(adjacent_tile).get_wall() &&
-    //map.get_Tile(adjacent_tile).get_owner() == 
-    //map.get_Tile(location).get_owner()) << std::endl;
     return (map.get_Tile(adjacent_tile).get_wall() &&
     map.get_Tile(adjacent_tile).get_owner() == 
     map.get_Tile(location).get_owner());
@@ -280,7 +275,7 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
         // Odd row
         if(location.first > 0){
             // Not on top row
-            if(location.second < map.get_width() - 1){
+            if(location.second < map.get_width() - 1){ 
                 // Not on right column
                 walls[1] = walls[1] && !does_wall_connect(map,location,coordinates(location.first-1,location.second+1));
             }
@@ -310,16 +305,15 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
     return os;
 }
 
-// int main(){
-//     Map new_map = parse_csv("example_map.txt");
-//     std::cout << new_map;
-//     Game new_game = Game(new_map,0,std::vector<Province>(),coordinates(-1,-1));
-//     std::vector<coordinates> test = new_game.get_neighbours_locations(coordinates(1,1));
-//     for(coordinates c : test){
-//         std::cout << c.first << "," << c.second << std::endl;
-//     }
-//     std::cout << new_game;
-//     new_game.update_provinces();
-//     std::cout << new_game;
-//     return 0;
-// }
+void Game::on_tile_click(coordinates location){
+    
+}
+
+void Game::on_end_turn(){
+    
+}
+
+
+void Game::on_rewind(){
+    
+}
