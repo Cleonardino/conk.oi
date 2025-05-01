@@ -13,7 +13,7 @@ class Display {
         bool isRunning;
         SDL_Window *window;
         SDL_Renderer *renderer;
-        SDL_Rect src, dest;
+        SDL_Rect dest;
         std::map<int, std::map<int, SDL_Texture*>> textures;
         Game game;
     public:

@@ -28,7 +28,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         {
             std::cout << "Window created" << std::endl;
         }
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if(renderer)
         {
             SDL_SetRenderDrawColor(renderer, 50, 125, 160, 255);
@@ -104,6 +104,7 @@ void Display::handleEvents()
                         std::cout << "i: " << mat_i << " j: " << mat_j << std::endl;
                     }
                 }
+                break;
         }
     }
 }
@@ -130,14 +131,13 @@ void Display::DrawMap()
     window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
     int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
-    src.y = src.x = 0;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    src.w = dest.w = HEXA_SIZE;
-    src.h = dest.h = HEXA_SIZE;
+    dest.w = HEXA_SIZE;
+    dest.h = HEXA_SIZE;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
@@ -152,7 +152,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += HEXA_SIZE;
-            TileManager::DrawTile(renderer, textures, src, dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
+            TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
         }
         dest.y += HEXA_SIZE * 19/32;
     }
@@ -169,14 +169,13 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     int map_w = map_row_size * HEXA_SIZE + HEXA_SIZE/2;
     int map_h = (map_col_size+1) * HEXA_SIZE * 19/32;
     SDL_Rect actuR;
-    src.y = src.x = 0;
     dest.y = 0;
     if (window_h > map_h)
     {
         dest.y = (window_h - map_h) / 2;
     }
-    src.w = dest.w = actuR.w = HEXA_SIZE;
-    src.h = dest.h = actuR.h =HEXA_SIZE;
+    dest.w = actuR.w = HEXA_SIZE;
+    dest.h = actuR.h =HEXA_SIZE;
     for(int i = 0; i<map_col_size;i++)
     {
         if (window_w > map_w)
@@ -241,14 +240,13 @@ void Display::DrawButton()
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
-    src.x = src.y = 0;
-    src.w = dest.w = BUTTON_X_SIZE;
-    src.h = dest.h = BUTTON_Y_SIZE;
+    dest.w = BUTTON_X_SIZE;
+    dest.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
-    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], src, dest);
+    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
     dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
-    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], src, dest);
+    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
 }
 
 bool Display::InButton(int posx, int posy, int *button_id)
@@ -257,9 +255,8 @@ bool Display::InButton(int posx, int posy, int *button_id)
     int window_h;
     SDL_Rect actuR;
     SDL_GetWindowSize(window, &window_w, &window_h);
-    src.x = src.y = 0;
-    src.w = dest.w = actuR.w = BUTTON_X_SIZE;
-    src.h = dest.h = actuR.h = BUTTON_Y_SIZE;
+    dest.w = actuR.w = BUTTON_X_SIZE;
+    dest.h = actuR.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
     actuR.x = posx - dest.x;
