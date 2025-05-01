@@ -296,50 +296,6 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
         }
     }
 
-    // // Tile on top
-    // 
-    //     // Not on the top row
-    //     if(map.get_Tile(coordinates(location.first-1,location.second)).get_type() == Land){
-    //         // Adding tile on the top
-    //         result.push_back(coordinates(location.first-1,location.second));
-    //     }
-    //     if(location.first % 2 == 0){
-    //         
-    //     }else{
-    //         if(location.second < map.get_width() - 1){
-    //         // Odd row, check tile on the top right
-    //             if(map.get_Tile(coordinates(location.first-1,location.second+1)).get_type() == Land){
-    //                 // Adding tile on the top right
-    //                 result.push_back(coordinates(location.first-1,location.second+1));
-    //             }
-    //         }
-    //     }
-    // }
-    // // Tile on bottom
-    // if(location.first < map.get_height() - 1){
-    //     // Not on the bottom row
-    //     if(map.get_Tile(coordinates(location.first+1,location.second)).get_type() == Land){
-    //         // Adding tile on the bottom
-    //         result.push_back(coordinates(location.first+1,location.second));
-    //     }
-    //     if(location.first % 2 == 0){
-    //         if(location.second > 0){
-    //         // Even row, check tile on the bottom left
-    //             if(map.get_Tile(coordinates(location.first+1,location.second-1)).get_type() == Land){
-    //                 // Adding tile on the bottom left
-    //                 result.push_back(coordinates(location.first+1,location.second-1));
-    //             }
-    //         }
-    //     }else{
-    //         if(location.second < map.get_width() - 1){
-    //         // Odd row, check tile on the bottom right
-    //             if(map.get_Tile(coordinates(location.first+1,location.second+1)).get_type() == Land){
-    //                 // Adding tile on the bottom right
-    //                 result.push_back(coordinates(location.first+1,location.second+1));
-    //             }
-    //         }
-    //     }
-    // }
     // To complete
     return TileDisplayInfos(map.get_Tile(location), walls, selected, province_selected, valid_destination);
 }
