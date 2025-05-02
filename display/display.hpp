@@ -7,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include "../model/game.hpp"
+#define BUTTON_ZOOM 2
 
 class Display {
     private:

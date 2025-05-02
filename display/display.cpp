@@ -2,17 +2,18 @@
 #include "texturemanager.hpp"
 #include "tilemanager.hpp"
 #include "constants.hpp"
+#include "numbermanager.hpp"
 
 Display::Display(Game game_): game(game_){}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
-#define BUTTON_X_SIZE 64 * 2
-#define BUTTON_Y_SIZE 32 * 2
+#define BUTTON_X_SIZE 64 * BUTTON_ZOOM
+#define BUTTON_Y_SIZE 32 * BUTTON_ZOOM
 #define PLAY_X_SIZE 64
 #define PLAY_Y_SIZE 32
-#define BUTTON_SPACE 256 * 2
-#define PROVINCE_PANEL_SIZE 192 * 2
+#define BUTTON_SPACE 256 * BUTTON_ZOOM
+#define PROVINCE_PANEL_SIZE 192 * BUTTON_ZOOM
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -82,6 +83,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
     textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
     textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
+    textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer);
 }
 
 void Display::handleEvents()
@@ -292,8 +294,10 @@ void Display::DrawButton()
     dest.x += BUTTON_X_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     dest.w = PROVINCE_PANEL_SIZE;
     TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
+    dest.x += PROVINCE_PANEL_SIZE - 32 * BUTTON_ZOOM;
+    NumberManager::DrawMoneyRecap(renderer, textures, &dest, 2, 9);
     dest.w = BUTTON_X_SIZE;
-    dest.x += PROVINCE_PANEL_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
+    dest.x += 32 * BUTTON_ZOOM + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
 }
 
