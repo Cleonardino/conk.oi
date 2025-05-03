@@ -89,7 +89,7 @@ SDL_Texture* TileManager::LoadTile(const int tile_id, SDL_Renderer* renderer)
 
 Color_RGB TileManager::GenerateColor(const int player_id, const int player_number)
 {
-    float h = (360.0f / player_number) * player_id;
+    float h = (360.0f / player_number) * (player_id + 1);
     float s = 0.8f;
     float v = 0.9f;
 
@@ -111,6 +111,11 @@ Color_RGB TileManager::GenerateColor(const int player_id, const int player_numbe
         (int)((gf + m) * 255),
         (int)((bf + m) * 255)
     };
+    if (player_id == -1)
+    {
+        Color_RGB bandit_color = {(int) 28, (int) 20, (int) 42};
+        return bandit_color;
+    }
     return color;
 }
 

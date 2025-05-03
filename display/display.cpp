@@ -67,15 +67,15 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
     textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
     int nb_players = game.get_max_player_count();
-    for (int i = 1; i < nb_players; i++)
+    for (int i = -1; i < nb_players; i++)
     {
-        textures[FORTRESS_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
-        textures[TOWN_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/town.png");
-        textures[PEASANT_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/peasant.png");
-        textures[HERO_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/hero.png");
-        textures[KNIGHT_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/knight.png");
-        textures[SOLDIER_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/soldier.png");
-        textures[PLAYERS_TILES][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer, "../art/tiles/land.png");
+        textures[FORTRESS_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
+        textures[TOWN_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/town.png");
+        textures[PEASANT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/peasant.png");
+        textures[HERO_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/hero.png");
+        textures[KNIGHT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/knight.png");
+        textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/soldier.png");
+        textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer, "../art/tiles/land.png");
     }
     textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
@@ -113,19 +113,19 @@ void Display::handleEvents()
                         switch(tile_on)
                         {
                             case PEASANT_TILE:
-                                std::cout << "Paysan" << tile_on << std::endl;
+                                game.on_peasant_purchase();
                                 break;
                             case SOLDIER_TILE:
-                                std::cout << "Soldier" << tile_on << std::endl;
+                                game.on_soldier_purchase();
                                 break;
                             case KNIGHT_TILE:
-                                std::cout << "Knight" << tile_on << std::endl;
+                                game.on_knight_purchase();
                                 break;
                             case HERO_TILE:
-                                std::cout << "Hero" << tile_on << std::endl;
+                                game.on_hero_purchase();
                                 break;
                             case FORTRESS_TILE:
-                                std::cout << "Fortress" << tile_on << std::endl;
+                                game.on_fortress_purchase();
                                 break;
                         }
                     }
@@ -227,7 +227,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += actu_hexa_size;
-            TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner() + 2);
+            TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner());
         }
         dest.y += actu_hexa_size * 19/32;
     }
