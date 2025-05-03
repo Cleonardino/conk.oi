@@ -246,6 +246,15 @@ void Game::update_provinces(){
     // }
 }
 
+int Game::get_active_player_id() const{
+    return active_player_id;
+}
+
+int Game::get_next_player_id() const{
+    return active_player_id;
+}
+
+
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
     return (map.get_Tile(adjacent_tile).get_wall() &&
     map.get_Tile(adjacent_tile).get_owner() == 
@@ -461,7 +470,7 @@ void Game::on_tile_click(coordinates location){
             update_provinces();
         }
     }
-    
+
     if(map.get_Tile(location).get_type() == Land){
         selected_location = location;
     }

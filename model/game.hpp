@@ -71,6 +71,9 @@ class Game{
     int get_height() const;
     int get_width() const;
     int get_max_player_count() const;
+
+    int get_active_player_id() const;
+    int get_next_player_id() const;
     
     TileDisplayInfos get_display_infos(coordinates location) const;
     void on_tile_click(coordinates location);
