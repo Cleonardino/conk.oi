@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     Uint32 frameStart;
     int frameTime;
 
-    display.init("Coucou je suis la fenetre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+    display.init("Coucou je suis la fenetre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, true);
 
     while (display.running()) {
         frameStart = SDL_GetTicks();

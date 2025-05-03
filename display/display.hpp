@@ -5,9 +5,10 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cmath>
 #include <algorithm>
 #include "../model/game.hpp"
-#define BUTTON_ZOOM 2
+#define BUTTON_ZOOM 3
 
 class Display {
     private:
@@ -34,6 +35,8 @@ class Display {
     void DrawMap();
     void DrawButton();
     void DrawPlay();
+    void DrawProvincePanel();
+    void DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_displacement);
     bool InPlay(int posx, int posy);
     bool InButton(int posx, int posy, int *button_id);
     bool InTile(SDL_Rect dest, int posx_mouse, int posy_mouse);
