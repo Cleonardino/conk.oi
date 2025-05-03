@@ -1,7 +1,3 @@
 # TO DO
-Game display
-Tile click detection
-Button click detection
-Color swapper
-Game center
-Game zoom
+Changing window's name
+Changing game constructor

@@ -6,6 +6,7 @@
 #include <set>
 #include "map.hpp"
 #include "parser.hpp"
+#include "game_constants.hpp"
 
 // A class consisting of a collection of tiles locations, and all informations relevant to a province.
 class Province{
@@ -64,7 +65,7 @@ class Game{
     bool is_destination_valid(coordinates destination) const;
     
     public:
-    Game(Map map_, int active_player_id_, std::vector<Province> provinces_, int max_player_count);
+    Game(Map map_, int active_player_id_, std::vector<Province> provinces_);
     int get_height() const;
     int get_width() const;
     int get_max_player_count() const;

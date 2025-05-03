@@ -1,0 +1,13 @@
+#ifndef GAME_CONSTANTS_HPP
+#define GAME_CONSTANTS_HPP
+
+#define EMPTY_POWER 0
+#define BANDIT_POWER 0
+#define PEASANT_POWER 1
+#define TOWN_POWER 1
+#define SOLDIER_POWER 2
+#define FORTRESS_POWER 2
+#define KNIGHT_POWER 3
+#define HERO_POWER 4
+
+#endif

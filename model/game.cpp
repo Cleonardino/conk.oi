@@ -83,12 +83,19 @@ bool TileDisplayInfos::get_valid_destination() const{
 }
 
 // Class constructor
-Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_, int max_player_count_):
-map(map_), active_player_id(active_player_id_), provinces(provinces_), max_player_count(max_player_count_)
+Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
+map(map_), active_player_id(active_player_id_), provinces(provinces_)
 {
     selected_location = coordinates(-1,-1);
     update_select();
     update_provinces();
+    // Get max player id + 1 from map to have the max_player_count
+    max_player_count = 1;
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            max_player_count = std::max(max_player_count,map.get_Tile(coordinates(i,j)).get_owner() + 1);
+        }
+    }
 }
 
 // Getter of game's map height
@@ -320,13 +327,14 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
 }
 
 bool Game::is_destination_valid(coordinates destination) const{
-    // If no character is selected or the character is sleeping, no destination is marked as valid
-    if(map.get_Tile(selected_location).get_character().get_type() == Empty ||
-    map.get_Tile(selected_location).get_character().get_has_moved()){
+    // If no character is selected,the character is sleeping or the
+    // selected tile don't belong to the active player, no destination is marked as valid
+    if(map.get_Tile(selected_location).get_owner() != active_player_id ||
+        map.get_Tile(selected_location).get_character().get_type() == Empty ||
+        map.get_Tile(selected_location).get_character().get_has_moved()){
         return false;
     }
 
-    // To complete
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
         // Same owner, valid only if empty
         return (map.get_Tile(destination).get_character().get_type() == Empty &&
@@ -334,6 +342,7 @@ bool Game::is_destination_valid(coordinates destination) const{
     }
 
     // Tile to attack, check if the power level is sufficient
+    
     return true;
 }
 
