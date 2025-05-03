@@ -30,6 +30,8 @@ class Character{
     Character(CharacterType type_, bool has_moved_);
     CharacterType get_type() const;
     bool get_has_moved() const;
+    void exhaust();
+    void refresh();
 };
 
 enum BuildingType {

@@ -320,12 +320,20 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
 }
 
 bool Game::is_destination_valid(coordinates destination) const{
+    // If no character is selected or the character is sleeping, no destination is marked as valid
+    if(map.get_Tile(selected_location).get_character().get_type() == Empty ||
+    map.get_Tile(selected_location).get_character().get_has_moved()){
+        return false;
+    }
+
     // To complete
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
         // Same owner, valid only if empty
         return (map.get_Tile(destination).get_character().get_type() == Empty &&
         map.get_Tile(destination).get_building().get_type() == Wild);
     }
+
+    // Tile to attack, check if the power level is sufficient
     return true;
 }
 
@@ -362,6 +370,42 @@ void Game::on_tile_click(coordinates location){
         update_select();
         return;
     }
+    if(map.get_Tile(selected_location).get_character().get_type() != Empty){
+        // A character is selected
+        if(valid_destination[location.first][location.second]){
+            // Characters always destroy buildings where they move
+            bool has_wall = false;
+            Building building = Building(Wild);
+            Character character = map.get_Tile(selected_location).get_character();
+            // Move the character
+            if(map.get_Tile(location).get_owner() != active_player_id){
+                // Exhausting character
+                character.exhaust();
+            }
+            // Setting destination tile
+            map.set_Tile(
+                location,
+                Land,
+                active_player_id,
+                has_wall,
+                building,
+                character
+                );
+            // Removing character from origin tile
+            map.set_Tile(
+                selected_location,
+                Land,
+                active_player_id,
+                map.get_Tile(selected_location).get_wall(),
+                map.get_Tile(selected_location).get_building(),
+                Character(Empty,false)
+                );
+            selected_location = coordinates(-1,-1);
+            // Updating provinces
+            update_provinces();
+        }
+    }
+
     selected_location = location;
     update_select();
 }

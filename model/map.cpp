@@ -15,6 +15,17 @@ bool Character::get_has_moved() const {
     return has_moved;
 }
 
+// Exhaust a character
+void Character::exhaust(){
+    has_moved = true;
+}
+
+// Refresh a character
+void Character::refresh(){
+    has_moved = false;
+}
+
+
 // Class constructor
 Building::Building(BuildingType type_):
 type(type_),gold(0)
