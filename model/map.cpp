@@ -199,6 +199,9 @@ int Map::get_width() const{
 
 // Get a Tile based on its coordinates
 Tile Map::get_Tile(coordinates location) const {
+    if(location.first == -1 ||location.second == -1){
+        return Tile::default_Tile();
+    }
     return data[location.first][location.second];
 }
 
