@@ -427,3 +427,23 @@ void Game::on_end_turn(){
 void Game::on_rewind(){
     
 }
+
+void Game::on_peasant_purchase(){
+
+}
+
+void Game::on_soldier_purchase(){
+
+}
+
+void Game::on_knight_purchase(){
+
+}
+
+void Game::on_hero_purchase(){
+
+}
+
+void Game::on_fortress_purchase(){
+
+}
