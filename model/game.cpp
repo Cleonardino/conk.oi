@@ -322,11 +322,10 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
 bool Game::is_destination_valid(coordinates destination) const{
     // To complete
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
-        // Same owner
-        std::cout << "no:" << destination.first << "," << destination.second << std::endl;
-        return false;
+        // Same owner, valid only if empty
+        return (map.get_Tile(destination).get_character().get_type() == Empty &&
+        map.get_Tile(destination).get_building().get_type() == Wild);
     }
-    std::cout << "yes:" << destination.first << "," << destination.second << std::endl;
     return true;
 }
 
