@@ -2,16 +2,18 @@
 #include "texturemanager.hpp"
 #include "tilemanager.hpp"
 #include "constants.hpp"
+#include "numbermanager.hpp"
 
 Display::Display(Game game_): game(game_){}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
-#define BUTTON_X_SIZE 64 * 1.5
-#define BUTTON_Y_SIZE 32 * 1.5
+#define BUTTON_X_SIZE 64 * BUTTON_ZOOM
+#define BUTTON_Y_SIZE 32 * BUTTON_ZOOM
 #define PLAY_X_SIZE 64
 #define PLAY_Y_SIZE 32
-#define BUTTON_SPACE 256
+#define BUTTON_SPACE 256 * BUTTON_ZOOM
+#define PROVINCE_PANEL_SIZE 192 * BUTTON_ZOOM
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -44,7 +46,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
         int window_h;
         SDL_GetWindowSize(window, &window_w, &window_h);
         window_h = window_h - BUTTON_Y_SIZE;
-        actu_hexa_size = std::min(window_w/(map_row_size+1/2), window_h/map_col_size * 32/19);
+        actu_hexa_size = std::min(window_w/(map_row_size+1), window_h/map_col_size * 32/19);
         std::cout << actu_hexa_size << std::endl;
     }
     else
@@ -64,7 +66,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
     textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
     textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
-    int nb_players = 5;
+    int nb_players = game.get_max_player_count();
     for (int i = 1; i < nb_players; i++)
     {
         textures[FORTRESS_TILE][i-1] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
@@ -80,6 +82,9 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
     textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
     textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
+    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
+    textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer);
+    textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer);
 }
 
 void Display::handleEvents()
@@ -97,10 +102,32 @@ void Display::handleEvents()
                 int mat_i;
                 int mat_j;
                 int button_id;
+                int tile_on;
                 Uint32 bitmark;
                 bitmark = SDL_GetMouseState(&x,&y);
                 if (SDL_BUTTON(bitmark) == 1)
                 {
+                    if(InProvincePanel(x, y, &tile_on))
+                    {
+                        switch(tile_on)
+                        {
+                            case PEASANT_TILE:
+                                std::cout << "Paysan" << tile_on << std::endl;
+                                break;
+                            case SOLDIER_TILE:
+                                std::cout << "Soldier" << tile_on << std::endl;
+                                break;
+                            case KNIGHT_TILE:
+                                std::cout << "Knight" << tile_on << std::endl;
+                                break;
+                            case HERO_TILE:
+                                std::cout << "Hero" << tile_on << std::endl;
+                                break;
+                            case FORTRESS_TILE:
+                                std::cout << "Fortress" << tile_on << std::endl;
+                                break;
+                        }
+                    }
                     if(InButton(x,y,&button_id))
                     {
                         switch(button_id)
@@ -126,16 +153,17 @@ void Display::handleEvents()
             case SDL_MOUSEWHEEL:
                 if (actu_hexa_size > 0 || (actu_hexa_size == 0 and event.wheel.y > 0))
                 {
-                    actu_hexa_size += event.wheel.y * 2;
+                    actu_hexa_size += event.wheel.y * 8;
                 }
                 break;
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_LEFT:  window_center.first += 5; break;
-                    case SDLK_RIGHT: window_center.first -= 5; break;
-                    case SDLK_UP:    window_center.second += 5; break;
-                    case SDLK_DOWN:  window_center.second -= 5; break;
+                    case SDLK_LEFT:  window_center.first += 10; break;
+                    case SDLK_RIGHT: window_center.first -= 10; break;
+                    case SDLK_UP:    window_center.second += 10; break;
+                    case SDLK_DOWN:  window_center.second -= 10; break;
+                    case SDLK_ESCAPE: SDL_SetWindowFullscreen(window, 0); break;
                 }
                 break;
         }
@@ -208,7 +236,7 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     SDL_GetWindowSize(window, &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
-    int map_h = (map_col_size+1) * actu_hexa_size * 19/32;
+    int map_h = map_col_size * actu_hexa_size * 19/32;
     SDL_Rect actuR;
     dest.y = 0;
     if (window_h > map_h)
@@ -251,10 +279,10 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
 
 bool Display::InTile(SDL_Rect dest, int posx_mouse, int posy_mouse)
 {
-    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/(actu_hexa_size); // X Mouse position in tile dest referential
-    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/(actu_hexa_size); // Y Mouse position in tile dest referential
+    int mouse_x_in_tile = (posx_mouse - dest.x) * 32/actu_hexa_size; // X Mouse position in tile dest referential
+    int mouse_y_in_tile = (posy_mouse - dest.y) * 32/actu_hexa_size; // Y Mouse position in tile dest referential
 
-    if (mouse_y_in_tile >= 13 and mouse_y_in_tile <= 24 - 1) // Verification for center of the tile (base_tile dependant)
+    if (mouse_y_in_tile >= 13 and mouse_y_in_tile <= (24 - 1)) // Verification for center of the tile (base_tile dependant)
     {
         return true;
     }
@@ -287,8 +315,91 @@ void Display::DrawButton()
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
     TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
-    dest.x += BUTTON_SPACE + BUTTON_X_SIZE;
+    DrawProvincePanel();
+    dest.w = BUTTON_X_SIZE;
+    dest.x += 32 * BUTTON_ZOOM + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
+}
+
+void Display::DrawProvincePanel()
+{
+    int player_turn_id = 0; // Placeholder
+    dest.x += BUTTON_X_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
+    dest.w = PROVINCE_PANEL_SIZE;
+    TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
+    dest.w = 32 * BUTTON_ZOOM;
+    DrawPanelButton(textures[PEASANT_TILE][player_turn_id], 10, 0);//Placeholders for price
+    dest.x += 32 * BUTTON_ZOOM;
+    DrawPanelButton(textures[SOLDIER_TILE][player_turn_id], 9, 0);//Placeholders for price
+    dest.x += 32 * BUTTON_ZOOM;
+    DrawPanelButton(textures[KNIGHT_TILE][player_turn_id], 8, 0);//Placeholders for price
+    dest.x += 32 * BUTTON_ZOOM;
+    DrawPanelButton(textures[HERO_TILE][player_turn_id], 7, 0);//Placeholders for price
+    dest.x += 32 * BUTTON_ZOOM;
+    DrawPanelButton(textures[FORTRESS_TILE][player_turn_id], 6, 4 * BUTTON_ZOOM);//Placeholders for price
+    dest.x += 36 * BUTTON_ZOOM;
+    NumberManager::DrawMoneyRecap(renderer, textures, &dest, 2, 9); //Placeholders for price and gain
+    dest.x -= 4 * BUTTON_ZOOM;
+}
+
+void Display::DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_displacement)
+{
+    dest.y += tower_y_displacement;
+    dest.y -= 5 * BUTTON_ZOOM;
+    TextureManager::Draw(renderer, to_render, &dest);
+    dest.y += 27 * BUTTON_ZOOM;
+    dest.x += (32 - 18) / 2 * BUTTON_ZOOM;
+    dest.y -= tower_y_displacement;
+    NumberManager::DrawNumbers(renderer, textures, &dest, price);
+    dest.x -= (32 - 18) / 2 * BUTTON_ZOOM;
+    dest.y -= 22 * BUTTON_ZOOM;
+}
+
+bool Display::InProvincePanel(int posx, int posy, int *tile_on)
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = 32 * BUTTON_ZOOM;
+    dest.h = 32 * BUTTON_ZOOM;
+    dest.x = window_w/2 - BUTTON_SPACE/2 + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
+    dest.y = window_h - BUTTON_Y_SIZE;
+    int posx_mouse = posx - dest.x;
+    int posy_mouse = posy - dest.y;
+    int in_panel = -1;
+    for (int i = 0; i < 5;i++)
+    {
+        if (posx_mouse >= 0 + dest.w * i and posx_mouse <= dest.w * (i+1) and posy_mouse >= 0)
+        {
+            in_panel = i;
+        }
+    }
+    dest.x += dest.w * in_panel;
+    switch (in_panel)
+    {
+    case 0:
+        *tile_on = PEASANT_TILE;
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        return true;
+    case 1:
+        *tile_on = SOLDIER_TILE;
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        return true;
+    case 2:
+        *tile_on = KNIGHT_TILE;
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        return true;
+    case 3:
+        *tile_on = HERO_TILE;
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        return true;
+    case 4:
+        *tile_on = FORTRESS_TILE;
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        return true;
+    default:
+        return false;
+    }
 }
 
 bool Display::InButton(int posx, int posy, int *button_id)

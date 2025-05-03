@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     Map new_map = parse_csv("../example_map.txt");
-    Game new_game = Game(new_map,0,std::vector<Province>());
+    Game new_game = Game(new_map,0,std::vector<Province>(), 5);
     Display display = Display(new_game);
 
     const int FPS = 20;
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     Uint32 frameStart;
     int frameTime;
 
-    display.init("Coucou je suis la fenetre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, false);
+    display.init("Coucou je suis la fenetre", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, true);
 
     while (display.running()) {
         frameStart = SDL_GetTicks();
