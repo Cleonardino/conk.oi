@@ -80,6 +80,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
     textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
     textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
+    textures[LEVEL_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/levels_sign.png", renderer);
     textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
     textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
     textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
@@ -128,7 +129,7 @@ void Display::handleEvents()
                                 break;
                         }
                     }
-                    if(InButton(x,y,&button_id))
+                    else if(InButton(x,y,&button_id))
                     {
                         switch(button_id)
                         {
@@ -143,6 +144,10 @@ void Display::handleEvents()
                     else if (InPlay(x, y))
                     {
                         nowPlaying = true;
+                    }
+                    else if (InLevel(x, y))
+                    {
+                        std::cout << "Levels" << std::endl;
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
@@ -185,6 +190,7 @@ void Display::render()
     else
     {
         this->DrawPlay();
+        this->DrawLevel();
     }
     SDL_RenderPresent(renderer);
 }
@@ -379,7 +385,7 @@ bool Display::InProvincePanel(int posx, int posy, int *tile_on)
     {
     case 0:
         *tile_on = PEASANT_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
+        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest); 
         return true;
     case 1:
         *tile_on = SOLDIER_TILE;
@@ -439,6 +445,39 @@ void Display::DrawPlay()
     dest.x = window_w/2 - dest.w/2;
     dest.y = window_h/2 - dest.h/2;
     TextureManager::Draw(renderer, textures[PLAY_BUTTON][0], &dest);
+}
+
+void Display::DrawLevel()
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = PLAY_X_SIZE * 2;
+    dest.h = PLAY_Y_SIZE * 2;
+    dest.x = window_w/2 - dest.w/2;
+    dest.y = window_h/2 - dest.h/2 + PLAY_Y_SIZE * 5;
+    TextureManager::Draw(renderer, textures[LEVEL_BUTTON][0], &dest);
+}
+
+// void Display::DrawLevelSelector()
+// {
+    
+// }
+
+bool Display::InLevel(int posx, int posy)
+{
+    if (nowPlaying)
+    {
+        return false;
+    }
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = PLAY_X_SIZE * 2;
+    dest.h = PLAY_Y_SIZE * 2;
+    dest.x = window_w/2 - dest.w/2;
+    dest.y = window_h/2 - dest.h/2 + PLAY_Y_SIZE * 5;
+    return (posx - dest.x >= 0 and posx - dest.x <= dest.w and posy - dest.y >= 0 and posy - dest.y <= dest.h);
 }
 
 bool Display::InPlay(int posx, int posy)
