@@ -37,6 +37,7 @@ class Display {
     void DrawPlay();
     void DrawProvincePanel();
     void DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_displacement);
+    bool InProvincePanel(int posx, int posy, int *tile_on);
     bool InPlay(int posx, int posy);
     bool InButton(int posx, int posy, int *button_id);
     bool InTile(SDL_Rect dest, int posx_mouse, int posy_mouse);

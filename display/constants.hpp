@@ -25,3 +25,4 @@
 #define SLEEPING_CHAR 24
 #define PROVINCE_PANEL 25
 #define NUMBERS 26
+#define PANEL_SELECTED 27
