@@ -254,6 +254,18 @@ int Game::get_next_player_id() const{
     return active_player_id;
 }
 
+bool Game::do_display_panel() const{
+    return true;
+}
+
+int Game::get_displayed_income() const{
+    return 123;
+}
+
+int Game::get_displayed_gold() const{
+    return 456;
+}
+
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
     return (map.get_Tile(adjacent_tile).get_wall() &&

@@ -74,6 +74,10 @@ class Game{
 
     int get_active_player_id() const;
     int get_next_player_id() const;
+
+    bool do_display_panel() const;
+    int get_displayed_income() const;
+    int get_displayed_gold() const;
     
     TileDisplayInfos get_display_infos(coordinates location) const;
     void on_tile_click(coordinates location);
