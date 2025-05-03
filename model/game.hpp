@@ -63,6 +63,8 @@ class Game{
     void update_select();
     std::vector<coordinates> get_neighbours_locations(coordinates location) const;
     bool is_destination_valid(coordinates destination) const;
+    int get_singular_power_level(coordinates location) const;
+    int get_power_level(coordinates location) const;
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);

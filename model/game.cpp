@@ -342,8 +342,55 @@ bool Game::is_destination_valid(coordinates destination) const{
     }
 
     // Tile to attack, check if the power level is sufficient
-    
-    return true;
+    // Heroes can attack whatever they want
+    if(map.get_Tile(selected_location).get_character().get_type() == Hero){
+        return true;
+    }
+    // Check if power level is sufficient
+    return get_power_level(destination)<get_singular_power_level(selected_location);
+}
+
+// Compute power level of a tile without checking its neighbours
+int Game::get_singular_power_level(coordinates location) const{
+    int character_power = 0;
+    int building_power = 0;
+    switch (map.get_Tile(location).get_character().get_type())
+    {
+    case Peasant:
+        character_power = PEASANT_POWER;
+        break;
+    case Soldier:
+        character_power = SOLDIER_POWER;
+        break;
+    case Knight:
+        character_power = KNIGHT_POWER;
+        break;
+    case Hero:
+        character_power = HERO_POWER;
+        break;
+    }
+        switch (map.get_Tile(location).get_building().get_type())
+    {
+    case Town:
+        character_power = TOWN_POWER;
+        break;
+    case Fortress:
+        character_power = FORTRESS_POWER;
+        break;
+    }
+    return std::max(character_power,building_power);
+}
+
+// Compute power level of a tile
+int Game::get_power_level(coordinates location) const{
+    int result = get_singular_power_level(location);
+    for(coordinates neighbour : get_neighbours_locations(location)){
+        if(map.get_Tile(neighbour).get_owner() == map.get_Tile(location).get_owner()){
+            // If same owner, use protection
+            result = std::max(result,get_singular_power_level(neighbour));
+        }
+    }
+    return result;
 }
 
 // Update selected_province and valid_destination boolean matrixes.
@@ -414,8 +461,11 @@ void Game::on_tile_click(coordinates location){
             update_provinces();
         }
     }
+    
+    if(map.get_Tile(location).get_type() == Land){
+        selected_location = location;
+    }
 
-    selected_location = location;
     update_select();
 }
 
