@@ -10,7 +10,6 @@ displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
     selected_location = coordinates(-1,-1);
     update_select();
     update_provinces();
-    compute_next_player_id();
     // Get max player id + 1 from map to have the max_player_count
     max_player_count = 1;
     for(int i = 0; i < map.get_height(); i++){
@@ -18,7 +17,7 @@ displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
             max_player_count = std::max(max_player_count,map.get_Tile(coordinates(i,j)).get_owner() + 1);
         }
     }
-
+    compute_next_player_id();
     // Computing walls
     for(int i = 0; i < map.get_height(); i++){
         for(int j = 0; j < map.get_width(); j++){
@@ -190,6 +189,29 @@ int Game::get_province(coordinates location) const{
         }
     }
     return -1;
+}
+
+// Make strayed units go stray
+void Game::compute_strays(){
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &
+            map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty){
+                // Standard units, check if going rogue
+                if(get_province(coordinates(i,j)) == -1){
+                    // Stranded, go rogue
+                    map.set_Tile(
+                        coordinates(i,j),
+                        Land,
+                        -1,
+                        false,
+                        Building(Wild,0),
+                        Character(Bandit,false)
+                    );
+                }
+            }
+        }
+    }
 }
 
 // Reset selection state
