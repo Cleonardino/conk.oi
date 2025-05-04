@@ -8,9 +8,9 @@
 class NumberManager
 {
     public:
-        static void DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int to_draw);
-        static void DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int to_draw);
-        static void DrawMoneyRecap(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int money, int gain);
+        static void DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int to_draw);
+        static void DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int to_draw);
+        static void DrawMoneyRecap(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int money, int gain);
 };
 
 #endif

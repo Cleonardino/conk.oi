@@ -1,6 +1,6 @@
 #include "texturemanager.hpp"
 
-SDL_Texture* TextureManager::LoadTexture(const char* filename, SDL_Renderer* renderer)
+TexturePtr TextureManager::LoadTexture(const char* filename, SDL_Renderer* renderer)
 {
     SDL_Surface* tmpSurface = IMG_Load(filename);
     if (!tmpSurface) {
@@ -12,7 +12,7 @@ SDL_Texture* TextureManager::LoadTexture(const char* filename, SDL_Renderer* ren
     if (!tex) {
         std::cout << "Erreur SDL_CreateTextureFromSurface :" << SDL_GetError() << std::endl;
     }
-    return tex;
+    return TexturePtr(tex, SDL_DestroyTexture);
 }
 
 void TextureManager::Draw(SDL_Renderer* renderer, SDL_Texture* tex, SDL_Rect *dest)

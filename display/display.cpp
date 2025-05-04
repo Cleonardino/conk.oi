@@ -4,7 +4,7 @@
 #include "constants.hpp"
 #include "numbermanager.hpp"
 
-Display::Display(Game game_): game(game_){}
+Display::Display(Game game_, Map map_): game(game_), map(map_) {}
 Display::~Display(){}
 
 #define HEXA_SIZE 32 * 2
@@ -14,6 +14,7 @@ Display::~Display(){}
 #define PLAY_Y_SIZE 32
 #define BUTTON_SPACE 256 * BUTTON_ZOOM
 #define PROVINCE_PANEL_SIZE 192 * BUTTON_ZOOM
+#define LEVEL_NUMBER 4
 
 void Display::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
@@ -29,67 +30,72 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     {
         std::cout << "Subsystems Initialised" << std::endl;
 
-        window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-        if(window)
+        window = UniqueWindow(SDL_CreateWindow(title, xpos, ypos, width, height, flags), SDL_DestroyWindow);
+        if(window.get())
         {
             std::cout << "Window created" << std::endl;
         }
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        renderer = UniqueRenderer(SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_SOFTWARE), SDL_DestroyRenderer);
         if(renderer)
         {
-            SDL_SetRenderDrawColor(renderer, 50, 125, 160, 255);
+            SDL_SetRenderDrawColor(renderer.get(), 50, 125, 160, 255);
             std::cout << "Renderer created" << std::endl;
         }
         isRunning = true;
-        int map_row_size = game.get_width();
-        int map_col_size = game.get_height();
-        int window_w;
-        int window_h;
-        SDL_GetWindowSize(window, &window_w, &window_h);
-        window_h = window_h - BUTTON_Y_SIZE;
-        actu_hexa_size = std::min(window_w/(map_row_size+1), window_h/map_col_size * 32/19);
-        std::cout << actu_hexa_size << std::endl;
+        initMap();
     }
     else
     {
         isRunning = false;
     }
-    textures[BASE_TILE][0] = TileManager::LoadTile(BASE_TILE, renderer);
-    textures[FOREST_TILE][0] = TileManager::LoadTile(FOREST_TILE, renderer);
-    textures[OCEAN_TILE][0] = TileManager::LoadTile(OCEAN_TILE, renderer);
-    textures[BARRIER_TILE_BL][0] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer);
-    textures[BARRIER_TILE_BR][0] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer);
-    textures[BARRIER_TILE_L][0] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer);
-    textures[BARRIER_TILE_R][0] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer);
-    textures[BARRIER_TILE_TL][0] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer);
-    textures[BARRIER_TILE_TR][0] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer);
-    textures[CAMP_TILE][0] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer);
-    textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer);
-    textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer);
-    textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer);
+}
+
+void Display::initMap()
+{
+    int map_row_size = game.get_width();
+    int map_col_size = game.get_height();
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
+    window_h = window_h - BUTTON_Y_SIZE;
+    actu_hexa_size = std::min(window_w/(map_row_size+1), window_h/map_col_size * 32/19);
+    std::cout << actu_hexa_size << std::endl;
+    textures[BASE_TILE][0] = TileManager::LoadTile(BASE_TILE, renderer.get());
+    textures[FOREST_TILE][0] = TileManager::LoadTile(FOREST_TILE, renderer.get());
+    textures[OCEAN_TILE][0] = TileManager::LoadTile(OCEAN_TILE, renderer.get());
+    textures[BARRIER_TILE_BL][0] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer.get());
+    textures[BARRIER_TILE_BR][0] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer.get());
+    textures[BARRIER_TILE_L][0] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer.get());
+    textures[BARRIER_TILE_R][0] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer.get());
+    textures[BARRIER_TILE_TL][0] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer.get());
+    textures[BARRIER_TILE_TR][0] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer.get());
+    textures[CAMP_TILE][0] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer.get());
+    textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer.get());
+    textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer.get());
+    textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer.get());
     int nb_players = game.get_max_player_count();
     for (int i = -1; i < nb_players; i++)
     {
-        textures[FORTRESS_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/fortress.png");
-        textures[TOWN_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/tiles/town.png");
-        textures[PEASANT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/peasant.png");
-        textures[HERO_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/hero.png");
-        textures[KNIGHT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/knight.png");
-        textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer,"../art/characters/soldier.png");
-        textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer, "../art/tiles/land.png");
-        textures[PLAYER_TURN_INDICATION][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer, "../art/buttons/player_turn_indication.png");
+        textures[FORTRESS_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/tiles/fortress.png");
+        textures[TOWN_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/tiles/town.png");
+        textures[PEASANT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/peasant.png");
+        textures[HERO_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/hero.png");
+        textures[KNIGHT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/knight.png");
+        textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/soldier.png");
+        textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/tiles/land.png");
+        textures[PLAYER_TURN_INDICATION][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/buttons/player_turn_indication.png");
     }
-    textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer);
-    textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer);
-    textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer);
-    textures[LEVEL_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/levels_sign.png", renderer);
-    textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer);
-    textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer);
-    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
-    textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer);
-    textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer);
-    textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer);
-    textures[RETURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/return.png", renderer);
+    textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer.get());
+    textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer.get());
+    textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer.get());
+    textures[LEVEL_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/levels_sign.png", renderer.get());
+    textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer.get());
+    textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer.get());
+    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer.get());
+    textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer.get());
+    textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer.get());
+    textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer.get());
+    textures[RETURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/return.png", renderer.get());
 }
 
 void Display::handleEvents()
@@ -108,6 +114,7 @@ void Display::handleEvents()
                 int mat_j;
                 int button_id;
                 int tile_on;
+                int level_seletion;
                 Uint32 bitmark;
                 bitmark = SDL_GetMouseState(&x,&y);
                 if (SDL_BUTTON(bitmark) == 1)
@@ -136,6 +143,7 @@ void Display::handleEvents()
                     else if (InReturnSign(x,y))
                     {
                         nowPlaying = false;
+                        inLevelSelection = false;
                     }
                     else if(InButton(x,y,&button_id))
                     {
@@ -156,7 +164,38 @@ void Display::handleEvents()
                     else if (InLevel(x, y))
                     {
                         inLevelSelection = true;
-                        std::cout << "Levels" << std::endl;
+                    }
+                    else if (InLevelSelector(x, y, &level_seletion))
+                    {
+                        switch (level_seletion)
+                        {
+                        case 1:
+                            map = parse_csv("../example_map.txt");
+                            game = Game(map,0,std::vector<Province>());
+                            inLevelSelection = false;
+                            initMap();
+                            break;
+                        case 2:
+                            map = parse_csv("../map_level_2.txt");
+                            game = Game(map,0,std::vector<Province>());
+                            inLevelSelection = false;
+                            initMap();
+                            break;
+                        case 3:
+                            map = parse_csv("../map_level_3.txt");
+                            game = Game(map,0,std::vector<Province>());
+                            inLevelSelection = false;
+                            initMap();
+                            break;
+                        case 4:
+                            map = parse_csv("../map_level_4.txt");
+                            game = Game(map,0,std::vector<Province>());
+                            inLevelSelection = false;
+                            initMap();
+                            break;
+                        default:
+                            break;
+                        }
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
                     {
@@ -177,7 +216,7 @@ void Display::handleEvents()
                     case SDLK_RIGHT: window_center.first -= 10; break;
                     case SDLK_UP:    window_center.second += 10; break;
                     case SDLK_DOWN:  window_center.second -= 10; break;
-                    case SDLK_ESCAPE: SDL_SetWindowFullscreen(window, 0); break;
+                    case SDLK_ESCAPE: SDL_SetWindowFullscreen(window.get(), 0); break;
                 }
                 break;
         }
@@ -191,7 +230,7 @@ void Display::update()
 
 void Display::render()
 {
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(renderer.get());
     if (nowPlaying)
     {
         this->DrawMap();
@@ -203,13 +242,14 @@ void Display::render()
     else if (inLevelSelection)
     {
         this->DrawLevelSelector();
+        this->DrawReturnSign();
     }
     else
     {
         this->DrawPlay();
         this->DrawLevel();
     }
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer.get());
 }
 
 void Display::DrawMap()
@@ -218,7 +258,7 @@ void Display::DrawMap()
     int map_col_size = game.get_height();
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
     int map_h = map_col_size * actu_hexa_size * 19/32;
@@ -244,7 +284,7 @@ void Display::DrawMap()
         for(int j = 0; j<map_row_size;j++)
         {
             dest.x += actu_hexa_size;
-            TileManager::DrawTile(renderer, textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner());
+            TileManager::DrawTile(renderer.get(), textures, &dest, game.get_display_infos(coordinates(i,j)), game.get_display_infos(coordinates(i,j)).get_Tile().get_owner());
         }
         dest.y += actu_hexa_size * 19/32;
     }
@@ -256,7 +296,7 @@ bool Display::InMap(int posx_mouse, int posy_mouse, int *mat_row, int *mat_col)
     int map_col_size = game.get_height();
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
     int map_w = map_row_size * actu_hexa_size + actu_hexa_size/2;
     int map_h = map_col_size * actu_hexa_size * 19/32;
@@ -332,12 +372,12 @@ void Display::DrawButton()
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = BUTTON_X_SIZE;
     dest.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
     dest.y = window_h - BUTTON_Y_SIZE;
-    TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[REWIND_SIGN][0].get(), &dest);
     dest.x += BUTTON_X_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     if (game.do_display_panel())
     {
@@ -345,7 +385,7 @@ void Display::DrawButton()
     }
     dest.w = BUTTON_X_SIZE;
     dest.x += PROVINCE_PANEL_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
-    TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[END_TURN_SIGN][0].get(), &dest);
 }
 
 void Display::DrawProvincePanel()
@@ -354,24 +394,24 @@ void Display::DrawProvincePanel()
     int to_restore = dest.x;
     int gold = game.get_displayed_gold();
     dest.w = PROVINCE_PANEL_SIZE;
-    TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[PROVINCE_PANEL][0].get(), &dest);
     dest.w = 32 * BUTTON_ZOOM;
     if (gold >= PEASANT_COST)
-        DrawPanelButton(textures[PEASANT_TILE][player_turn_id], PEASANT_COST, 0);
+        DrawPanelButton(textures[PEASANT_TILE][player_turn_id].get(), PEASANT_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
     if (gold >= SOLDIER_COST)
-        DrawPanelButton(textures[SOLDIER_TILE][player_turn_id], SOLDIER_COST, 0);
+        DrawPanelButton(textures[SOLDIER_TILE][player_turn_id].get(), SOLDIER_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
     if (gold >= KNIGHT_COST)
-        DrawPanelButton(textures[KNIGHT_TILE][player_turn_id], KNIGHT_COST, 0);
+        DrawPanelButton(textures[KNIGHT_TILE][player_turn_id].get(), KNIGHT_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
     if (gold >= HERO_COST)
-        DrawPanelButton(textures[HERO_TILE][player_turn_id], HERO_COST, 0);
+        DrawPanelButton(textures[HERO_TILE][player_turn_id].get(), HERO_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
     if (gold >= FORTRESS_COST)
-        DrawPanelButton(textures[FORTRESS_TILE][player_turn_id], FORTRESS_COST, 4 * BUTTON_ZOOM);
+        DrawPanelButton(textures[FORTRESS_TILE][player_turn_id].get(), FORTRESS_COST, 4 * BUTTON_ZOOM);
     dest.x += 36 * BUTTON_ZOOM;
-    NumberManager::DrawMoneyRecap(renderer, textures, &dest, game.get_displayed_gold(), game.get_displayed_income());
+    NumberManager::DrawMoneyRecap(renderer.get(), textures, &dest, game.get_displayed_gold(), game.get_displayed_income());
     dest.x = to_restore;
 }
 
@@ -379,11 +419,11 @@ void Display::DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_dis
 {
     dest.y += tower_y_displacement;
     dest.y -= 5 * BUTTON_ZOOM;
-    TextureManager::Draw(renderer, to_render, &dest);
+    TextureManager::Draw(renderer.get(), to_render, &dest);
     dest.y += 27 * BUTTON_ZOOM;
     dest.x += (32 - 18) / 2 * BUTTON_ZOOM;
     dest.y -= tower_y_displacement;
-    NumberManager::DrawNumbers(renderer, textures, &dest, price);
+    NumberManager::DrawNumbers(renderer.get(), textures, &dest, price);
     dest.x -= (32 - 18) / 2 * BUTTON_ZOOM;
     dest.y -= 22 * BUTTON_ZOOM;
 }
@@ -394,17 +434,17 @@ void Display::DrawPlayerIndicator()
     int next_player_turn = game.get_next_player_id();
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = window_w - 32 * BUTTON_ZOOM - 32;
     dest.y = 10 * BUTTON_ZOOM;
-    TextureManager::Draw(renderer, textures[PLAYER_TURN_INDICATION][actu_player_turn], &dest);
+    TextureManager::Draw(renderer.get(), textures[PLAYER_TURN_INDICATION][actu_player_turn].get(), &dest);
     dest.w = dest.w/2;
     dest.h = dest.h/2;
     dest.x += 20 * BUTTON_ZOOM;
     dest.y -= 4 * BUTTON_ZOOM;
-    TextureManager::Draw(renderer, textures[PLAYER_TURN_INDICATION][next_player_turn], &dest);
+    TextureManager::Draw(renderer.get(), textures[PLAYER_TURN_INDICATION][next_player_turn].get(), &dest);
 }
 
 void Display::DrawUnderCursor(TileDisplayInfos to_draw)
@@ -419,21 +459,21 @@ void Display::DrawUnderCursor(TileDisplayInfos to_draw)
     dest.y = y - dest.h/2;
     if (to_draw.get_Tile().get_building().get_type() == Fortress)
     {
-        TextureManager::Draw(renderer, textures[FORTRESS_TILE][game.get_active_player_id()], &dest);
+        TextureManager::Draw(renderer.get(), textures[FORTRESS_TILE][game.get_active_player_id()].get(), &dest);
     }
     switch (to_draw.get_Tile().get_character().get_type())
     {
         case Peasant:
-            TextureManager::Draw(renderer, textures[PEASANT_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer.get(), textures[PEASANT_TILE][game.get_active_player_id()].get(), &dest);
             break;
         case Soldier:
-            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer.get(), textures[SOLDIER_TILE][game.get_active_player_id()].get(), &dest);
             break;
         case Knight:
-            TextureManager::Draw(renderer, textures[KNIGHT_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer.get(), textures[KNIGHT_TILE][game.get_active_player_id()].get(), &dest);
             break;
         case Hero:
-            TextureManager::Draw(renderer, textures[HERO_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer.get(), textures[HERO_TILE][game.get_active_player_id()].get(), &dest);
             break;
     }
 }
@@ -442,19 +482,23 @@ void Display::DrawReturnSign()
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = BUTTON_X_SIZE/2;
     dest.h = BUTTON_Y_SIZE/2;
     dest.x = 32 /2;
     dest.y = 32 /2;
-    TextureManager::Draw(renderer, textures[RETURN_SIGN][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[RETURN_SIGN][0].get(), &dest);
 }
 
 bool Display::InReturnSign(int posx, int posy)
 {
+    if (!nowPlaying and !inLevelSelection)
+    {
+        return false;
+    }
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = BUTTON_X_SIZE/2;
     dest.h = BUTTON_Y_SIZE/2;
     dest.x = 32 /2;
@@ -468,7 +512,7 @@ bool Display::InProvincePanel(int posx, int posy, int *tile_on)
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = window_w/2 - BUTTON_SPACE/2 + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
@@ -512,7 +556,7 @@ bool Display::InButton(int posx, int posy, int *button_id)
     int window_w;
     int window_h;
     SDL_Rect actuR;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = actuR.w = BUTTON_X_SIZE;
     dest.h = actuR.h = BUTTON_Y_SIZE;
     dest.x = window_w/2 - BUTTON_SPACE/2 - BUTTON_X_SIZE;
@@ -538,39 +582,39 @@ void Display::DrawPlay()
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = PLAY_X_SIZE * 5;
     dest.h = PLAY_Y_SIZE * 5;
     dest.x = window_w/2 - dest.w/2;
     dest.y = window_h/2 - dest.h/2;
-    TextureManager::Draw(renderer, textures[PLAY_BUTTON][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[PLAY_BUTTON][0].get(), &dest);
 }
 
 void Display::DrawLevel()
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = PLAY_X_SIZE * 2;
     dest.h = PLAY_Y_SIZE * 2;
     dest.x = window_w/2 - dest.w/2;
     dest.y = window_h/2 - dest.h/2 + PLAY_Y_SIZE * 5;
-    TextureManager::Draw(renderer, textures[LEVEL_BUTTON][0], &dest);
+    TextureManager::Draw(renderer.get(), textures[LEVEL_BUTTON][0].get(), &dest);
 }
 
 void Display::DrawLevelSelector()
 {
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = (window_w - 5 * dest.w)/6;
     dest.y = dest.h;
-    for (int i = 1; i < 9; i++)
+    for (int i = 1; i <= LEVEL_NUMBER; i++)
     {
-        TextureManager::Draw(renderer, textures[ONE_LEVEL_BACKGROUND][0], &dest);
-        NumberManager::DrawOneNumber(renderer, textures, &dest, i);
+        TextureManager::Draw(renderer.get(), textures[ONE_LEVEL_BACKGROUND][0].get(), &dest);
+        NumberManager::DrawOneNumber(renderer.get(), textures, &dest, i);
         dest.x += dest.w + (window_w - 5 * dest.w)/6;
         if (i%5 == 0)
         {
@@ -578,6 +622,36 @@ void Display::DrawLevelSelector()
             dest.y += dest.h * 2;
         }
     }
+}
+
+bool Display::InLevelSelector(int posx, int posy, int *level_selected)
+{
+    if (nowPlaying or !inLevelSelection)
+    {
+        return false;
+    }
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
+    dest.w = 32 * BUTTON_ZOOM;
+    dest.h = 32 * BUTTON_ZOOM;
+    dest.x = (window_w - 5 * dest.w)/6;
+    dest.y = dest.h;
+    for (int i = 1; i <= LEVEL_NUMBER; i++)
+    {
+        if (posx - dest.x >= 0 and posx - dest.x <= dest.w and posy - dest.y >= 0 and posy - dest.y <= dest.h)
+        {
+            *level_selected = i;
+            return true;
+        }
+        dest.x += dest.w + (window_w - 5 * dest.w)/6;
+        if (i%5 == 0)
+        {
+            dest.x = (window_w - 5 * dest.w)/6;
+            dest.y += dest.h * 2;
+        }
+    }
+    return false;
 }
 
 bool Display::InLevel(int posx, int posy)
@@ -588,7 +662,7 @@ bool Display::InLevel(int posx, int posy)
     }
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = PLAY_X_SIZE * 2;
     dest.h = PLAY_Y_SIZE * 2;
     dest.x = window_w/2 - dest.w/2;
@@ -604,7 +678,7 @@ bool Display::InPlay(int posx, int posy)
     }
     int window_w;
     int window_h;
-    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
     dest.w = PLAY_X_SIZE * 5;
     dest.h = PLAY_Y_SIZE * 5;
     dest.x = window_w/2 - dest.w/2;
@@ -618,8 +692,6 @@ bool Display::InPlay(int posx, int posy)
 
 void Display::clean()
 {
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
     SDL_Quit();
     std::cout << "Display Killed" << std::endl;
 }
