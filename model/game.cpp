@@ -5,11 +5,12 @@
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile()),
-displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false), history()
+displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false), history(), finished(false)
 {
     selected_location = coordinates(-1,-1);
     update_select();
     update_provinces();
+    compute_next_player_id();
     // Get max player id + 1 from map to have the max_player_count
     max_player_count = 1;
     for(int i = 0; i < map.get_height(); i++){
@@ -217,17 +218,43 @@ void Game::load_gamestamp(){
     map = history.top().get_map();
     active_player_id = history.top().get_active_player_id();
     history.pop();
+    compute_next_player_id();
     reset_select();
 }
 
+// Return true if the player with id id is alive
+bool Game::is_player_alive(int id){
+    // To complete
+    return true;
+}
+
+// Set next player id to next alive player or -1 if is last player. Set finished to true if only one player remain
+void Game::compute_next_player_id(){
+    int current_id = (active_player_id + 1) % max_player_count;
+    next_player_id = active_player_id;
+    // Do a complete loop
+    while(current_id != active_player_id && next_player_id == active_player_id){
+        if(is_player_alive(current_id)){
+            // Found another alive player, set next_player_id to it
+            next_player_id = current_id;
+        }
+        // Increment
+        current_id  = (current_id + 1) % max_player_count;
+    }
+    // If a whole loop was done without finding any other alive player, set finished to true
+    finished = (next_player_id == active_player_id);
+    // If the end of the loop was reached, i.e. if the next_id is smaller than active_player_id, next_player is bandits (-1)
+    if(next_player_id < active_player_id){
+        next_player_id = -1;
+    }
+}
 
 int Game::get_active_player_id() const{
     return active_player_id;
 }
 
 int Game::get_next_player_id() const{
-    // To complete
-    return active_player_id;
+    return next_player_id;
 }
 
 bool Game::do_display_panel() const{
@@ -548,6 +575,8 @@ void Game::move_character(coordinates source, coordinates destination){
     }
     // Updating provinces
     update_provinces();
+    // Update next player id
+    compute_next_player_id();
 }
 
 void Game::place_unit(coordinates location){
@@ -626,7 +655,8 @@ void Game::on_tile_click(coordinates location){
 
 // When pressing the end turn button
 void Game::on_end_turn(){
-    
+    active_player_id = next_player_id;
+    compute_next_player_id();
 }
 
 // When pressing the rewind button

@@ -15,6 +15,8 @@ class Game{
     private:
     Map map;
     int active_player_id;
+    int next_player_id;
+    bool finished;
     int max_player_count;
     bool display_panel;
     int displayed_income;
@@ -40,6 +42,8 @@ class Game{
     void pay_for(coordinates location, int amount);
     void place_unit(coordinates location);
     void try_retreat(coordinates location);
+    bool is_player_alive(int id);
+    void compute_next_player_id();
     void reset_select();
     void save_gamestamp();
     void load_gamestamp();
@@ -52,6 +56,7 @@ class Game{
 
     int get_active_player_id() const;
     int get_next_player_id() const;
+    bool get_finished() const;
 
     bool do_display_panel() const;
     int get_displayed_income() const;
