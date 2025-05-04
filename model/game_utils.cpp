@@ -23,7 +23,3 @@ int hex_distance(coordinates location_a, coordinates location_b){
     Cube b = coordinates_to_cube(location_b);
     return cube_distance(a, b);
 }
-
-int main(){
-    std::cout << hex_distance(coordinates(2,0),coordinates(2,2)) << std::endl;
-}
