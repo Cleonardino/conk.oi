@@ -42,6 +42,8 @@ class Display {
     void DrawPlayerIndicator();
     void DrawLevelSelector();
     void DrawUnderCursor(TileDisplayInfos to_draw);
+    void DrawReturnSign();
+    bool InReturnSign(int posx, int posy);
     bool InLevel(int posx, int posy);
     bool InProvincePanel(int posx, int posy, int *tile_on);
     bool InPlay(int posx, int posy);
