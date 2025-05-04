@@ -1,36 +1,6 @@
 #include "game.hpp"
 
 // Class constructor
-TileDisplayInfos::TileDisplayInfos(Tile tile_, std::vector<bool> walls_, bool selected_, bool province_selected_, bool valid_destination_):
-tile(tile_),walls(walls_),selected(selected_),province_selected(province_selected_),valid_destination(valid_destination_)
-{}
-
-// Getter method
-Tile TileDisplayInfos::get_Tile() const{
-    return tile;
-}
-
-// Getter method
-std::vector<bool> TileDisplayInfos::get_walls() const{
-    return walls;
-}
-
-// Getter method
-bool TileDisplayInfos::get_selected() const{
-    return selected;
-}
-
-// Getter method
-bool TileDisplayInfos::get_province_selected() const{
-    return province_selected;
-}
-
-// Getter method
-bool TileDisplayInfos::get_valid_destination() const{
-    return valid_destination;
-}
-
-// Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile()),
 displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
@@ -215,7 +185,6 @@ int Game::get_displayed_income() const{
 int Game::get_displayed_gold() const{
     return displayed_gold;
 }
-
 
 bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
     return (map.get_Tile(adjacent_tile).get_wall() &&
