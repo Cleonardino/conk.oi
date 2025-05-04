@@ -37,6 +37,7 @@ class Game{
     void set_wall(coordinates location, bool value);
     void pay_for(coordinates location, int amount);
     void place_unit(coordinates location);
+    void try_retreat(coordinates location);
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);

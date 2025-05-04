@@ -441,6 +441,29 @@ void Game::pay_for(coordinates location, int amount){
     }
 }
 
+// Make the unit located at location try to retreat
+void Game::try_retreat(coordinates location){
+    for(coordinates neighbour : get_neighbours_locations(location)){
+        // Retreat on first valid neighbour
+        if(
+            map.get_Tile(neighbour).get_owner() == map.get_Tile(location).get_owner() &&
+            map.get_Tile(neighbour).get_building().get_type() == Wild &&
+            map.get_Tile(neighbour).get_character().get_type() == Empty
+        ){
+            // Retreat to neighbour
+            map.set_Tile(
+                neighbour,
+                Land,
+                map.get_Tile(neighbour).get_owner(),
+                map.get_Tile(neighbour).get_wall(),
+                Building(Wild,0),
+                map.get_Tile(location).get_character()
+            );
+            return;
+        }
+    }
+}
+
 void Game::move_character(coordinates source, coordinates destination){
     bool has_wall = false;
     // Checking if a building belonging to the player is nearby, adding walls if true
@@ -456,7 +479,14 @@ void Game::move_character(coordinates source, coordinates destination){
         // Exhausting character
         character.exhaust();
         // Checking if a building is being destroyed
-         building_destroyed = (map.get_Tile(destination).get_building().get_type() != Wild);
+        building_destroyed = (map.get_Tile(destination).get_building().get_type() != Wild);
+        // Checking if a character inside walls is killed. If so, try to retreat
+        if(
+            map.get_Tile(destination).get_character().get_type() != Empty &&
+            map.get_Tile(destination).get_wall()
+        ){
+            try_retreat(destination);
+        }
     }
     // Setting destination tile. Characters always destroy buildings where they move
     map.set_Tile(
