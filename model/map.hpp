@@ -82,6 +82,7 @@ class Tile{
     Building get_building() const;
     Character get_character() const;
     void add_gold(int amount);
+    void refresh();
 
     friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
 };
@@ -102,6 +103,7 @@ class Map{
     void set_Tile(coordinates location, TileType tile_type, int owner_id,
         bool has_wall, Building building, Character character);
     void add_gold(coordinates location, int amount);
+    void refresh(coordinates location);
     friend std::ostream& operator<<(std::ostream& os, const Map& map);
 };
 

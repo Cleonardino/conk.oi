@@ -49,6 +49,9 @@ class Game{
     void load_gamestamp();
     int get_province(coordinates location) const;
     void compute_strays();
+    void rebel(Province province);
+    void standard_upkeep(Province province);
+    void compute_income(int player_id);
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);

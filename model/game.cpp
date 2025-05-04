@@ -196,10 +196,10 @@ void Game::compute_strays(){
     for(int i = 0; i < map.get_height(); i++){
         for(int j = 0; j < map.get_width(); j++){
             if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &
-            map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty){
+            map.get_Tile(coordinates(i,j)).get_character().get_type() != Bandit){
                 // Standard units, check if going rogue
                 if(get_province(coordinates(i,j)) == -1){
-                    // Stranded, go rogue
+                    // Stranded, go rogue and destroy tile
                     map.set_Tile(
                         coordinates(i,j),
                         Land,
@@ -212,6 +212,71 @@ void Game::compute_strays(){
             }
         }
     }
+}
+
+// Called when a province rebel because of insufficient revenue
+void Game::rebel(Province province){
+    for(coordinates location : province.get_locations()){
+        if(map.get_Tile(location).get_character().get_type() != Empty &
+            map.get_Tile(location).get_character().get_type() != Bandit){
+            // Stranded unit, go rogue
+            map.set_Tile(
+                location,
+                Land,
+                province.get_owner(),
+                map.get_Tile(location).get_wall(),
+                Building(Wild,0),
+                Character(Bandit,false)
+            );
+        }
+    }
+}
+
+// Retrieve gold, pay units upkeep and refresh them
+void Game::standard_upkeep(Province province){
+    // Adding revenues to towns
+    for(coordinates location : province.get_locations()){
+        // Getting closest town
+        int closest_distance = 10000;
+        coordinates closest_town = coordinates(-1,-1);
+        for(coordinates province_tile : province.get_locations()){
+            if(map.get_Tile(province_tile).get_building().get_type() == Town){
+                // Town of province
+                if(hex_distance(province_tile,location) < closest_distance){
+                    // Closer than the previous closest
+                    closest_distance = hex_distance(province_tile,location);
+                    closest_town = province_tile;
+                }
+            }
+        }
+        // Add one gold to the closest town
+        map.add_gold(closest_town,1);
+    }
+
+    // Paying upkeeps with gold in towns and refreshing units
+    for(coordinates location : province.get_locations()){
+        int to_pay = map.get_Tile(location).get_character().get_upkeep() +
+                        map.get_Tile(location).get_building().get_upkeep();
+        pay_for(location,to_pay);
+        map.refresh(location);
+    }
+}
+
+// Compute all income related tasks for a player, such as giving money to towns and making
+// insufficiently funded provinces rebel.
+void Game::compute_income(int player_id){
+    for(Province province : provinces){
+        if(province.get_owner() == active_player_id){
+            // Compute income for the province as it belong to the active player
+            if(province.get_income() + province.get_gold() < 0){
+                // If the income is not sufficient, rebel
+                rebel(province);
+            }
+            // Then, even if the province rebel, get income
+            standard_upkeep(province);
+        }
+    }
+
 }
 
 // Reset selection state
@@ -267,6 +332,7 @@ void Game::compute_next_player_id(){
     }
 }
 
+// Getters
 int Game::get_active_player_id() const{
     return active_player_id;
 }
@@ -285,6 +351,10 @@ int Game::get_displayed_income() const{
 
 int Game::get_displayed_gold() const{
     return displayed_gold;
+}
+
+bool Game::get_finished() const{
+    return finished;
 }
 
 TileDisplayInfos Game::get_cursor_infos() const{
@@ -479,6 +549,7 @@ void Game::update_select(){
     }
 }
 
+// Pay for a units with the closest town in the same province, passing to the next closest one if insufficient, etc...
 void Game::pay_for(coordinates location, int amount){
     std::vector<coordinates> nearest_towns = std::vector<coordinates>();
     int remaining_amount = amount;
@@ -668,8 +739,14 @@ void Game::on_tile_click(coordinates location){
 
 // When pressing the end turn button
 void Game::on_end_turn(){
-    active_player_id = next_player_id;
+    compute_strays();
+    // Checking if next player changed
     compute_next_player_id();
+    active_player_id = next_player_id;
+    // Updating next player
+    compute_next_player_id();
+    compute_income(active_player_id);
+    update_provinces();
 }
 
 // When pressing the rewind button

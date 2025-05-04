@@ -149,6 +149,11 @@ void Tile::add_gold(int amount){
     building.add_gold(amount);
 }
 
+// Refresh unit on tile
+void Tile::refresh(){
+    character.refresh();
+}
+
 // Used for debugging purpose and testing of game's logic
 std::ostream& operator<<(std::ostream& os, const Tile& tile) {
     switch (tile.tile_type)
@@ -299,4 +304,8 @@ std::ostream& operator<<(std::ostream& os, const Map& map) {
 
 void Map::add_gold(coordinates location, int amount){
     data[location.first][location.second].add_gold(amount);
+}
+
+void Map::refresh(coordinates location){
+    data[location.first][location.second].refresh();
 }
