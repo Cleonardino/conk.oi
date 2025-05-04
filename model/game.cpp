@@ -87,6 +87,7 @@ Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_)
 {
     selected_location = coordinates(-1,-1);
+    cursor = Tile::default_Tile();
     update_select();
     update_provinces();
     // Get max player id + 1 from map to have the max_player_count
@@ -251,6 +252,7 @@ int Game::get_active_player_id() const{
 }
 
 int Game::get_next_player_id() const{
+    // To complete
     return active_player_id;
 }
 
@@ -271,6 +273,10 @@ bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile)
     return (map.get_Tile(adjacent_tile).get_wall() &&
     map.get_Tile(adjacent_tile).get_owner() == 
     map.get_Tile(location).get_owner());
+}
+
+TileDisplayInfos Game::get_cursor_infos() const{
+    TileDisplayInfos(cursor,std::vector(6,true),false,false,false);
 }
 
 // Compute all infos needed for displaying a tile

@@ -57,6 +57,7 @@ class Game{
     coordinates selected_location;
     std::vector<std::vector<bool>> province_selected;
     std::vector<std::vector<bool>> valid_destination;
+    Tile cursor;
 
     private:
     void update_provinces();
@@ -79,7 +80,10 @@ class Game{
     int get_displayed_income() const;
     int get_displayed_gold() const;
     
+
+    TileDisplayInfos get_cursor_infos() const;
     TileDisplayInfos get_display_infos(coordinates location) const;
+
     void on_tile_click(coordinates location);
     void on_end_turn();
     void on_rewind();
