@@ -555,16 +555,15 @@ void Game::bandits_turn(){
             if(map.get_Tile(coordinates(i,j)).get_character().get_type() == Bandit &&
             !map.get_Tile(coordinates(i,j)).get_character().get_has_moved()){
                 // Ready Bandit
-                if(map.get_Tile(coordinates(i,j)).get_owner() != -1 ||
+                if(map.get_Tile(coordinates(i,j)).get_owner() == -1 ||
                 map.get_Tile(coordinates(i,j)).get_wall()){
-                    std::cout << i << "," << j << " moving" << std::endl;
                     // Try to move
                     std::vector<coordinates> neighbours = get_neighbours_locations(coordinates(i,j));
 
                     // Shuffle neighbours
                     std::vector<int> index(neighbours.size());
-                    for(int i = 0; i < neighbours.size(); ++i){
-                        index[i] = i;
+                    for(int k = 0; k < neighbours.size(); ++k){
+                        index[k] = k;
                     }
                         
                     // Shuffling
@@ -572,14 +571,13 @@ void Game::bandits_turn(){
                     std::mt19937 g(rd());
                     std::shuffle(index.begin(), index.end(), g);
                     bool has_moved_on_turn = false;
-                    for(int i : index){
+                    for(int k : index){
                         if(
                             !has_moved_on_turn &&
-                            !map.get_Tile(neighbours[i]).get_wall() &&
-                            map.get_Tile(neighbours[i]).get_building().get_type() == Wild &&
-                            map.get_Tile(neighbours[i]).get_character().get_type() == Empty
+                            !map.get_Tile(neighbours[k]).get_wall() &&
+                            map.get_Tile(neighbours[k]).get_building().get_type() == Wild &&
+                            map.get_Tile(neighbours[k]).get_character().get_type() == Empty
                             ){
-                                std::cout << neighbours[i].first << "," << neighbours[i].second << " go" << std::endl;
                                 has_moved_on_turn = true;
                                 // Move to tile
                                 map.set_Tile(
@@ -591,18 +589,17 @@ void Game::bandits_turn(){
                                     Character(Empty,false)
                                 );
                                 map.set_Tile(
-                                    neighbours[i],
+                                    neighbours[k],
                                     Land,
-                                    map.get_Tile(coordinates(i,j)).get_owner(),
-                                    map.get_Tile(coordinates(i,j)).get_wall(),
-                                    map.get_Tile(coordinates(i,j)).get_building(),
+                                    map.get_Tile(neighbours[k]).get_owner(),
+                                    map.get_Tile(neighbours[k]).get_wall(),
+                                    map.get_Tile(neighbours[k]).get_building(),
                                     Character(Bandit,true)
                                 );
                             }
                     }
 
                 }else{
-                    std::cout << i << "," << j << " stealing" << std::endl;
                     // Steal
                     map.set_Tile(
                         coordinates(i,j),
@@ -612,7 +609,53 @@ void Game::bandits_turn(){
                         Building(Wild,0),
                         Character(Bandit,true)
                     );
+                    Province province = get_province(coordinates(i,j));
+                    // Give gold to closest camp connect
+                    int closest_distance = 10000;
+                    coordinates closest_camp = coordinates(-1,-1);
+                    for(coordinates province_tile : province.get_locations()){
+                        if(map.get_Tile(province_tile).get_building().get_type() == Town){
+                            // Camp of province
+                            if(hex_distance(province_tile,coordinates(i,j)) < closest_distance){
+                                // Closer than the previous closest
+                                closest_distance = hex_distance(province_tile,coordinates(i,j));
+                                closest_camp = province_tile;
+                            }
+                        }
+                    }
+                    // Add one gold to the closest camp
+                    map.add_gold(closest_camp,1);
                 }
+            }
+        }
+    }
+
+    // Refresh all bandits, camp spawns bandits
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_character().get_type() == Bandit){
+                map.set_Tile(
+                    coordinates(i,j),
+                    Land,
+                    map.get_Tile(coordinates(i,j)).get_owner(),
+                    map.get_Tile(coordinates(i,j)).get_wall(),
+                    map.get_Tile(coordinates(i,j)).get_building(),
+                    Character(Bandit,false)
+                );
+            }
+            if(map.get_Tile(coordinates(i,j)).get_building().get_type() == Town &&
+            map.get_Tile(coordinates(i,j)).get_owner() == -1 &&
+            map.get_Tile(coordinates(i,j)).get_building().get_gold()>2){
+                // Spawn bandit
+                map.set_Tile(
+                    coordinates(i,j),
+                    Land,
+                    map.get_Tile(coordinates(i,j)).get_owner(),
+                    map.get_Tile(coordinates(i,j)).get_wall(),
+                    map.get_Tile(coordinates(i,j)).get_building(),
+                    Character(Bandit,false)
+                );
+                map.add_gold(coordinates(i,j),-3);
             }
         }
     }
