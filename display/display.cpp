@@ -217,6 +217,33 @@ void Display::handleEvents()
                     case SDLK_UP:    window_center.second += 10; break;
                     case SDLK_DOWN:  window_center.second -= 10; break;
                     case SDLK_ESCAPE: SDL_SetWindowFullscreen(window.get(), 0); break;
+                    case SDLK_1:
+                    case SDLK_KP_1: 
+                    if (game.do_display_panel() and game.get_displayed_gold() >= PEASANT_COST)
+                        game.on_peasant_purchase();
+                    break;
+                    case SDLK_2:
+                    case SDLK_KP_2:
+                    if (game.do_display_panel() and game.get_displayed_gold() >= SOLDIER_COST)
+                        game.on_soldier_purchase();
+                    break;
+                    case SDLK_3:
+                    case SDLK_KP_3:
+                    if (game.do_display_panel() and game.get_displayed_gold() >= KNIGHT_COST)
+                        game.on_knight_purchase();
+                    break;
+                    case SDLK_4:
+                    case SDLK_KP_4:
+                    if (game.do_display_panel() and game.get_displayed_gold() >= HERO_COST)
+                        game.on_hero_purchase();
+                    break;
+                    case SDLK_f:
+                    if (game.do_display_panel() and game.get_displayed_gold() >= FORTRESS_COST)
+                        game.on_fortress_purchase();
+                    break;
+                    case SDLK_r:
+                    game.on_rewind();
+                    break;
                 }
                 break;
         }
