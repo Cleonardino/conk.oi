@@ -15,6 +15,7 @@ class Display {
         int cmt = 0;
         int actu_hexa_size;
         bool isRunning;
+        bool inLevelSelection;
         bool nowPlaying;
         SDL_Window *window;
         SDL_Renderer *renderer;
@@ -39,6 +40,8 @@ class Display {
     void DrawProvincePanel();
     void DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_displacement);
     void DrawPlayerIndicator();
+    void DrawLevelSelector();
+    void DrawUnderCursor(TileDisplayInfos to_draw);
     bool InLevel(int posx, int posy);
     bool InProvincePanel(int posx, int posy, int *tile_on);
     bool InPlay(int posx, int posy);

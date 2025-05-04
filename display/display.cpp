@@ -19,6 +19,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
 {
     int flags = 0;
     nowPlaying = false;
+    inLevelSelection = false;
     if(fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
@@ -87,6 +88,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer);
     textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer);
     textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer);
+    textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer);
 }
 
 void Display::handleEvents()
@@ -148,6 +150,7 @@ void Display::handleEvents()
                     }
                     else if (InLevel(x, y))
                     {
+                        inLevelSelection = true;
                         std::cout << "Levels" << std::endl;
                     }
                     else if(InMap(x,y,&mat_i,&mat_j))
@@ -189,6 +192,11 @@ void Display::render()
         this->DrawMap();
         this->DrawButton();
         this->DrawPlayerIndicator();
+        this->DrawUnderCursor(game.get_cursor_infos());
+    }
+    else if (inLevelSelection)
+    {
+        this->DrawLevelSelector();
     }
     else
     {
@@ -333,7 +341,7 @@ void Display::DrawButton()
 
 void Display::DrawProvincePanel()
 {
-    int player_turn_id = 0; // Placeholder
+    int player_turn_id = game.get_active_player_id(); // Placeholder
     int to_restore = dest.x;
     dest.w = PROVINCE_PANEL_SIZE;
     TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
@@ -348,7 +356,7 @@ void Display::DrawProvincePanel()
     dest.x += 32 * BUTTON_ZOOM;
     DrawPanelButton(textures[FORTRESS_TILE][player_turn_id], 6, 4 * BUTTON_ZOOM);//Placeholders for price
     dest.x += 36 * BUTTON_ZOOM;
-    NumberManager::DrawMoneyRecap(renderer, textures, &dest, 2, 9); //Placeholders for price and gain
+    NumberManager::DrawMoneyRecap(renderer, textures, &dest, game.get_displayed_gold(), game.get_displayed_income());
     dest.x = to_restore;
 }
 
@@ -367,21 +375,52 @@ void Display::DrawPanelButton(SDL_Texture* to_render, int price, int tower_y_dis
 
 void Display::DrawPlayerIndicator()
 {
-    int actu_player_turn = 0;
-    int next_player_turn = 1;
+    int actu_player_turn = game.get_active_player_id();
+    int next_player_turn = game.get_next_player_id();
     int window_w;
     int window_h;
     SDL_GetWindowSize(window, &window_w, &window_h);
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = window_w - 32 * BUTTON_ZOOM - 32;
-    dest.y = 32;
+    dest.y = 10 * BUTTON_ZOOM;
     TextureManager::Draw(renderer, textures[PLAYER_TURN_INDICATION][actu_player_turn], &dest);
     dest.w = dest.w/2;
     dest.h = dest.h/2;
     dest.x += 20 * BUTTON_ZOOM;
-    dest.y -= 12;
+    dest.y -= 4 * BUTTON_ZOOM;
     TextureManager::Draw(renderer, textures[PLAYER_TURN_INDICATION][next_player_turn], &dest);
+}
+
+void Display::DrawUnderCursor(TileDisplayInfos to_draw)
+{
+    int x;
+    int y;
+    Uint32 bitmark;
+    bitmark = SDL_GetMouseState(&x,&y);
+    dest.w = 32 * BUTTON_ZOOM;
+    dest.h = 32 * BUTTON_ZOOM;
+    dest.x = x - dest.w/2;
+    dest.y = y - dest.h/2;
+    if (to_draw.get_Tile().get_building().get_type() == Fortress)
+    {
+        TextureManager::Draw(renderer, textures[FORTRESS_TILE][game.get_active_player_id()], &dest);
+    }
+    switch (to_draw.get_Tile().get_character().get_type())
+    {
+        case Peasant:
+            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            break;
+        case Soldier:
+            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            break;
+        case Knight:
+            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            break;
+        case Hero:
+            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            break;
+    }
 }
 
 bool Display::InProvincePanel(int posx, int posy, int *tile_on)
@@ -482,10 +521,27 @@ void Display::DrawLevel()
     TextureManager::Draw(renderer, textures[LEVEL_BUTTON][0], &dest);
 }
 
-// void Display::DrawLevelSelector()
-// {
-    
-// }
+void Display::DrawLevelSelector()
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = 32 * BUTTON_ZOOM;
+    dest.h = 32 * BUTTON_ZOOM;
+    dest.x = (window_w - 5 * dest.w)/6;
+    dest.y = dest.h;
+    for (int i = 1; i < 9; i++)
+    {
+        TextureManager::Draw(renderer, textures[ONE_LEVEL_BACKGROUND][0], &dest);
+        NumberManager::DrawOneNumber(renderer, textures, &dest, i);
+        dest.x += dest.w + (window_w - 5 * dest.w)/6;
+        if (i%5 == 0)
+        {
+            dest.x = (window_w - 5 * dest.w)/6;
+            dest.y += dest.h * 2;
+        }
+    }
+}
 
 bool Display::InLevel(int posx, int posy)
 {

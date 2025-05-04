@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     Game new_game = Game(new_map,0,std::vector<Province>());
     Display display = Display(new_game);
 
-    const int FPS = 20;
+    const int FPS = 60;
     const int frameDelay = 1000 / FPS;
 
     Uint32 frameStart;
