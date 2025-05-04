@@ -15,6 +15,21 @@ displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
             max_player_count = std::max(max_player_count,map.get_Tile(coordinates(i,j)).get_owner() + 1);
         }
     }
+
+    // Computing walls
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_building().get_type() != Wild){
+                // Add walls on tile and neighbours
+                set_wall(coordinates(i,j),true);
+                for(coordinates location : get_neighbours_locations(coordinates(i,j))){
+                    // Set wall to true if tile is a land and have same owner
+                    set_wall(location,map.get_Tile(location).get_type() == Land &&
+                             map.get_Tile(location).get_owner() == map.get_Tile(coordinates(i,j)).get_owner());
+                }
+            }
+        }
+    }
 }
 
 // Getter of game's map height
@@ -105,6 +120,18 @@ std::vector<coordinates> Game::get_neighbours_locations(coordinates location) co
     return result;
 }
 
+// Set wall value on tile
+void Game::set_wall(coordinates location, bool value){
+    map.set_Tile(
+    location,
+    map.get_Tile(location).get_type(),
+    map.get_Tile(location).get_owner(),
+    value,
+    map.get_Tile(location).get_building(),
+    map.get_Tile(location).get_character()
+);
+}
+
 // Compute provinces after a tile is changed
 void Game::update_provinces(){
     // Reset provinces
@@ -113,6 +140,7 @@ void Game::update_provinces(){
     std::vector<coordinates> all_towns;
     std::stack<coordinates> to_treat;
     std::set<coordinates> treated;
+
     // All tiles containing a town in a stack
     for(int i = 0; i < map.get_height(); i++){
         for(int j = 0; j < map.get_width(); j++){
@@ -175,7 +203,7 @@ int Game::get_next_player_id() const{
 }
 
 bool Game::do_display_panel() const{
-    return true;
+    return display_panel;
 }
 
 int Game::get_displayed_income() const{

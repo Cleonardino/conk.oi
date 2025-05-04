@@ -32,7 +32,6 @@ Map parse_csv(std::string filepath) {
     // Tile data
     TileType tile_type;
     int owner_id;
-    bool has_wall;
     BuildingType building_type;
     CharacterType character_type;
 
@@ -59,7 +58,6 @@ Map parse_csv(std::string filepath) {
                     // Ocean
                     tile_type = Ocean;
                     owner_id = -1;
-                    has_wall = false;
                     building_type = Wild;
                     character_type = Empty;
                     break;
@@ -68,7 +66,6 @@ Map parse_csv(std::string filepath) {
                     // Forest
                     tile_type = Forest;
                     owner_id = -1;
-                    has_wall = false;
                     building_type = Wild;
                     character_type = Empty;
                     break;
@@ -84,8 +81,7 @@ Map parse_csv(std::string filepath) {
                         // Owner
                         owner_id = std::stoi(splitted_tile[1]);
                     }
-                    has_wall = (splitted_tile[2][0] == 'w');
-                    switch (splitted_tile[3][0])
+                    switch (splitted_tile[2][0])
                     {
                     case 't':
                         // Town
@@ -99,7 +95,7 @@ Map parse_csv(std::string filepath) {
                         building_type = Wild;
                         break;
                     }
-                    switch (splitted_tile[4][0])
+                    switch (splitted_tile[3][0])
                     {
                     case 'p':
                         // Peasant
@@ -127,7 +123,7 @@ Map parse_csv(std::string filepath) {
 
                 // Update tile
                 result.set_Tile(coordinates(cur_row, cur_column), tile_type, owner_id,
-                    has_wall, Building(building_type), Character(character_type,false));
+                    false, Building(building_type), Character(character_type,false));
                     
                 cur_column++;
             }
@@ -142,9 +138,3 @@ Map parse_csv(std::string filepath) {
     }
 
 }
-
-// int main(){
-//     Map new_map = parse_csv("example_map.txt");
-//     std::cout << new_map;
-//     return 0;
-// }
