@@ -551,16 +551,19 @@ void Game::update_select(){
 
 // Pay for a units with the closest town in the same province, passing to the next closest one if insufficient, etc...
 void Game::pay_for(coordinates location, int amount){
+    if(amount == 0){
+        return;
+    }
     std::vector<coordinates> nearest_towns = std::vector<coordinates>();
     int remaining_amount = amount;
-    int selected_province_id = get_province(selected_location);
-    if(selected_province_id == -1){
+    int in_province_id = get_province(location);
+    if(in_province_id == -1){
         return;
     }
     // Retrieve towns ordered by distance
-    for(coordinates province_tile : provinces[selected_province_id].get_locations()){
+    for(coordinates province_tile : provinces[in_province_id].get_locations()){
         if(map.get_Tile(province_tile).get_building().get_type() == Town){
-            // Town of province, insert in vector with
+            // Town of province, insert in vector
             auto iter = nearest_towns.begin();
             while (iter != nearest_towns.end() && hex_distance(*iter,location) < hex_distance(province_tile,location)) {
                 ++iter;
@@ -574,7 +577,6 @@ void Game::pay_for(coordinates location, int amount){
         int amount_payed = std::min(map.get_Tile(*iter).get_building().get_gold(),remaining_amount);
         map.add_gold(*iter,-amount_payed);
         remaining_amount -= amount_payed;
-        std::cout << amount_payed << std::endl;
         ++iter;
     }
 }
@@ -747,6 +749,7 @@ void Game::on_end_turn(){
     compute_next_player_id();
     compute_income(active_player_id);
     update_provinces();
+    update_select();
 }
 
 // When pressing the rewind button

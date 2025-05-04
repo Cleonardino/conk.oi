@@ -16,7 +16,6 @@ class Province{
 
     public:
     Province(int owner_id);
-    int add_gold(int amount);
     int get_gold() const;
     int get_owner() const;
     int get_income() const;

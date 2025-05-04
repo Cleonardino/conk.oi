@@ -7,12 +7,6 @@ locations(std::set<coordinates>()),
 owner_id(owner_id_), gold(0), income(0)
 {}
 
-// Add the amount gold to the province (can be negative)
-int Province::add_gold(int amount){
-    gold += amount;
-    return gold;
-}
-
 // Getter method
 int Province::get_gold() const{
     return gold;

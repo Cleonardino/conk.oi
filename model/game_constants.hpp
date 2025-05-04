@@ -1,6 +1,8 @@
 #ifndef GAME_CONSTANTS_HPP
 #define GAME_CONSTANTS_HPP
 
+#define BASE_TOWN_GOLD 10
+
 // Power
 #define PEASANT_POWER 1
 #define TOWN_POWER 1
