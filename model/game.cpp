@@ -468,6 +468,11 @@ void Game::update_select(){
 void Game::move_character(coordinates source, coordinates destination){
     // Characters always destroy buildings where they move
     bool has_wall = false;
+    // Checking if a building belonging to the player is nearby, adding walls if true
+    for(coordinates neighbour : get_neighbours_locations(destination)){
+        has_wall = has_wall ||
+        (map.get_Tile(neighbour).get_building().get_type() != Wild && map.get_Tile(neighbour).get_owner() == active_player_id);
+    }
     Building building = Building(Wild);
     Character character = map.get_Tile(source).get_character();
     // Move the character
