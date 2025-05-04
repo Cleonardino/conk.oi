@@ -180,20 +180,16 @@ void Game::update_provinces(){
             }
         }
     }
-    // Check for strayed units and turn them into bandits
-    // for(int i = 0; i < map.get_height(); i++){
-    //     for(int j = 0; j < map.get_width(); j++){
-    //         if(map.get_Tile(coordinates(i,j)).get_character().get_type() != Empty &&
-    //         map.get_Tile(coordinates(i,j)).get_character().get_type() != Bandit){
-    //             // A standard unit is present, check if it's in a province
-    //             if(treated.find(coordinates(i,j)) == treated.end()){
-    //                 // Not treated -> not connected to a province
-    //                     map.set_Tile(coordinates(i,j),Land,map.get_Tile(coordinates(i,j)).get_owner(),
-    //                     false,Building(Wild),Character(Bandit,false));
-    //             }
-    //         }
-    //     }
-    // }
+}
+
+// Return indexes of the province the coordinates location belongs to, or -1 if a stranded tile
+int Game::get_province(coordinates location) const{
+    for(int i = 0; i < provinces.size(); i++){
+        if(provinces[i].does_contain(location)){
+            return i;
+        }
+    }
+    return -1;
 }
 
 // Reset selection state
@@ -431,29 +427,25 @@ void Game::update_select(){
     std::vector<coordinates> tiles_selected = std::vector<coordinates>();
     // Compute new selection
     bool no_province_selected = true;
-    for(Province province : provinces){
-        if(province.does_contain(selected_location)){
-            // The selected province
-            no_province_selected = false;
-            if(map.get_Tile(selected_location).get_owner() == active_player_id){
-                displayed_gold = province.get_gold();
-                displayed_income = province.get_income();
-                display_panel = true;
-            }else{
-                displayed_gold = 0;
-                displayed_income = 0;
-                display_panel = false;
-            }
-            for(coordinates location : province.get_locations()){
-                province_selected[location.first][location.second] = true;
-                tiles_selected.push_back(location);
-            }
-        }
-    }
-    if(no_province_selected){
+    int selected_province_id = get_province(selected_location);
+    if(selected_province_id == -1){
         displayed_gold = 0;
         displayed_income = 0;
         display_panel = false;
+    }else{
+        if(map.get_Tile(selected_location).get_owner() == active_player_id){
+            displayed_gold = provinces[selected_province_id].get_gold();
+            displayed_income = provinces[selected_province_id].get_income();
+            display_panel = true;
+        }else{
+            displayed_gold = 0;
+            displayed_income = 0;
+            display_panel = false;
+        }
+        for(coordinates location : provinces[selected_province_id].get_locations()){
+            province_selected[location.first][location.second] = true;
+            tiles_selected.push_back(location);
+        }
     }
     std::vector<coordinates> edges;
     // Get neighbours on selected province's edges
@@ -468,29 +460,29 @@ void Game::update_select(){
 void Game::pay_for(coordinates location, int amount){
     std::vector<coordinates> nearest_towns = std::vector<coordinates>();
     int remaining_amount = amount;
-    for(Province province : provinces){
-        if(province.does_contain(selected_location)){
-            // Selected province, retrieve towns ordered by distance
-            for(coordinates province_tile : province.get_locations()){
-                if(map.get_Tile(province_tile).get_building().get_type() == Town){
-                    // Town of province, insert in vector with
-                    auto iter = nearest_towns.begin();
-                    while (iter != nearest_towns.end() && hex_distance(*iter,location) < hex_distance(province_tile,location)) {
-                        ++iter;
-                    }
-                    nearest_towns.insert(iter, province_tile);
-                }
-            }
+    int selected_province_id = get_province(selected_location);
+    if(selected_province_id == -1){
+        return;
+    }
+    // Retrieve towns ordered by distance
+    for(coordinates province_tile : provinces[selected_province_id].get_locations()){
+        if(map.get_Tile(province_tile).get_building().get_type() == Town){
+            // Town of province, insert in vector with
             auto iter = nearest_towns.begin();
-            while(iter != nearest_towns.end() && remaining_amount > 0){
-                // Pay with closest town
-                int amount_payed = std::min(map.get_Tile(*iter).get_building().get_gold(),remaining_amount);
-                map.add_gold(*iter,-amount_payed);
-                remaining_amount -= amount_payed;
-                std::cout << amount_payed << std::endl;
+            while (iter != nearest_towns.end() && hex_distance(*iter,location) < hex_distance(province_tile,location)) {
                 ++iter;
             }
+            nearest_towns.insert(iter, province_tile);
         }
+    }
+    auto iter = nearest_towns.begin();
+    while(iter != nearest_towns.end() && remaining_amount > 0){
+        // Pay with closest town
+        int amount_payed = std::min(map.get_Tile(*iter).get_building().get_gold(),remaining_amount);
+        map.add_gold(*iter,-amount_payed);
+        remaining_amount -= amount_payed;
+        std::cout << amount_payed << std::endl;
+        ++iter;
     }
 }
 
@@ -619,7 +611,6 @@ void Game::on_tile_click(coordinates location){
             place_unit(location);
         }
         cursor_infos = Tile::default_Tile();
-        selected_location = coordinates(-1,-1);
         // Calculate province upkeep and gold again
         update_provinces();
         update_select();
