@@ -89,6 +89,7 @@ void Display::init(const char* title, int xpos, int ypos, int width, int height,
     textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer);
     textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer);
     textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer);
+    textures[RETURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/return.png", renderer);
 }
 
 void Display::handleEvents()

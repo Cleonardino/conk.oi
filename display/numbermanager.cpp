@@ -4,7 +4,14 @@
 void NumberManager::DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int to_draw)
 {
     SDL_Rect srcRect;
-    srcRect.x = 0 + 6 * (to_draw%10);
+    if (to_draw == -1)
+    {
+        srcRect.x = 60;
+    }
+    else
+    {
+        srcRect.x = 0 + 6 * (to_draw%10);
+    }
     srcRect.y = 0;
     srcRect.w = 6;         // Largeur de la sous-image
     srcRect.h = 9;
@@ -21,7 +28,15 @@ void NumberManager::DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<i
     int actu_to_print = to_draw;
     for (int i = 0; i < MAX_NUMBER_SEEN; i++)
     {
-        DrawOneNumber(renderer, textures, &one_number_dest, actu_to_print);
+        std::cout << actu_to_print << std::endl;
+        if (i == MAX_NUMBER_SEEN - 1 and to_draw < 0)
+        {
+            DrawOneNumber(renderer, textures, &one_number_dest, -1);
+        }
+        else
+        {
+            DrawOneNumber(renderer, textures, &one_number_dest, std::abs(actu_to_print));
+        }
         actu_to_print = actu_to_print/10;
         one_number_dest.x = one_number_dest.x - one_number_dest.w;
     }
