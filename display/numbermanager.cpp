@@ -28,7 +28,6 @@ void NumberManager::DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<i
     int actu_to_print = to_draw;
     for (int i = 0; i < MAX_NUMBER_SEEN; i++)
     {
-        std::cout << actu_to_print << std::endl;
         if (i == MAX_NUMBER_SEEN - 1 and to_draw < 0)
         {
             DrawOneNumber(renderer, textures, &one_number_dest, -1);

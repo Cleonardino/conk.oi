@@ -133,6 +133,10 @@ void Display::handleEvents()
                                 break;
                         }
                     }
+                    else if (InReturnSign(x,y))
+                    {
+                        nowPlaying = false;
+                    }
                     else if(InButton(x,y,&button_id))
                     {
                         switch(button_id)
@@ -193,6 +197,7 @@ void Display::render()
         this->DrawMap();
         this->DrawButton();
         this->DrawPlayerIndicator();
+        this->DrawReturnSign();
         this->DrawUnderCursor(game.get_cursor_infos());
     }
     else if (inLevelSelection)
@@ -334,7 +339,10 @@ void Display::DrawButton()
     dest.y = window_h - BUTTON_Y_SIZE;
     TextureManager::Draw(renderer, textures[REWIND_SIGN][0], &dest);
     dest.x += BUTTON_X_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
-    DrawProvincePanel();
+    if (game.do_display_panel())
+    {
+        DrawProvincePanel();
+    }
     dest.w = BUTTON_X_SIZE;
     dest.x += PROVINCE_PANEL_SIZE + (BUTTON_SPACE - PROVINCE_PANEL_SIZE)/2;
     TextureManager::Draw(renderer, textures[END_TURN_SIGN][0], &dest);
@@ -428,6 +436,32 @@ void Display::DrawUnderCursor(TileDisplayInfos to_draw)
             TextureManager::Draw(renderer, textures[HERO_TILE][game.get_active_player_id()], &dest);
             break;
     }
+}
+
+void Display::DrawReturnSign()
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = BUTTON_X_SIZE/2;
+    dest.h = BUTTON_Y_SIZE/2;
+    dest.x = 32 /2;
+    dest.y = 32 /2;
+    TextureManager::Draw(renderer, textures[RETURN_SIGN][0], &dest);
+}
+
+bool Display::InReturnSign(int posx, int posy)
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    dest.w = BUTTON_X_SIZE/2;
+    dest.h = BUTTON_Y_SIZE/2;
+    dest.x = 32 /2;
+    dest.y = 32 /2;
+    int mouse_x_in_ref = posx - dest.x;
+    int mouse_y_in_ref = posy - dest.y;
+    return (mouse_x_in_ref >= 0 and mouse_x_in_ref <= dest.w and mouse_y_in_ref >= 0 and mouse_y_in_ref <= dest.h);
 }
 
 bool Display::InProvincePanel(int posx, int posy, int *tile_on)
