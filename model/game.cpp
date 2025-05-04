@@ -139,7 +139,7 @@ void Game::update_provinces(){
             if(treated.find(current) == treated.end() && map.get_Tile(current).get_owner() == current_owner_id){
                 // If not already visited and with the same owner
                 treated.insert(current);
-                provinces[current_province_id].add_location(current);
+                provinces[current_province_id].add_location(current,map.get_Tile(current));
                 std::vector<coordinates> neighbours = get_neighbours_locations(current);
                 for(coordinates neighbor : neighbours){
                     if(treated.find(neighbor) == treated.end()){
@@ -358,9 +358,15 @@ void Game::update_select(){
         if(province.does_contain(selected_location)){
             // The selected province
             no_province_selected = false;
-            displayed_gold = province.get_gold();
-            displayed_income = province.get_income();
-            display_panel = true;
+            if(map.get_Tile(selected_location).get_owner() == active_player_id){
+                displayed_gold = province.get_gold();
+                displayed_income = province.get_income();
+                display_panel = true;
+            }else{
+                displayed_gold = 0;
+                displayed_income = 0;
+                display_panel = false;
+            }
             for(coordinates location : province.get_locations()){
                 province_selected[location.first][location.second] = true;
                 tiles_selected.push_back(location);

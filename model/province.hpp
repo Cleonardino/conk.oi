@@ -22,7 +22,7 @@ class Province{
     int get_income() const;
     std::set<coordinates> get_locations() const;
     bool does_contain(coordinates location) const;
-    void add_location(coordinates location);
+    void add_location(coordinates location, Tile tile);
 
     friend std::ostream& operator<<(std::ostream& os, const Province& province);
 };

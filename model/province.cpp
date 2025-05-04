@@ -1,4 +1,5 @@
 #include "province.hpp"
+#include "game_constants.hpp"
 
 
 Province::Province(int owner_id_):
@@ -33,9 +34,34 @@ std::set<coordinates> Province::get_locations() const{
 }
 
 // Add a location to the province
-void Province::add_location(coordinates location){
+void Province::add_location(coordinates location, Tile tile){
     locations.insert(location);
     income++;
+    switch (tile.get_building().get_type())
+    {
+    case Town:
+        gold += tile.get_building().get_gold();
+        break;
+    case Fortress:
+        income -= FORTRESS_UPKEEP;
+        break;
+    }
+
+    switch (tile.get_character().get_type())
+    {
+    case Peasant:
+        income -= PEASANT_UPKEEP;
+        break;
+    case Soldier:
+        income -= SOLDIER_UPKEEP;
+        break;
+    case Knight:
+        income -= KNIGHT_UPKEEP;
+        break;
+    case Hero:
+        income -= HERO_UPKEEP;
+        break;
+    }
 }
 
 bool Province::does_contain(coordinates location) const{

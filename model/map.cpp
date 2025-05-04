@@ -28,7 +28,7 @@ void Character::refresh(){
 
 // Class constructor
 Building::Building(BuildingType type_):
-type(type_),gold(0)
+type(type_),gold(100)
 {}
 
 // Retrn type of building
