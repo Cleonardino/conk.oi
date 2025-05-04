@@ -579,21 +579,35 @@ void Game::bandits_turn(){
                             map.get_Tile(neighbours[k]).get_character().get_type() == Empty
                             ){
                                 has_moved_on_turn = true;
-                                // Move to tile
-                                map.set_Tile(
+                                if(map.get_Tile(coordinates(i,j)).get_building().get_type() == Town){
+                                    // Move from camp
+                                    map.set_Tile(
                                     coordinates(i,j),
                                     Land,
                                     map.get_Tile(coordinates(i,j)).get_owner(),
                                     map.get_Tile(coordinates(i,j)).get_wall(),
-                                    map.get_Tile(coordinates(i,j)).get_building(),
+                                    Building(Town,0),
                                     Character(Empty,false)
                                 );
+                                }else{
+                                    // Move from wild
+                                    map.set_Tile(
+                                    coordinates(i,j),
+                                    Land,
+                                    map.get_Tile(coordinates(i,j)).get_owner(),
+                                    map.get_Tile(coordinates(i,j)).get_wall(),
+                                    Building(Wild,0),
+                                    Character(Empty,false)
+                                );
+                                }
+                                
+                                // Move to
                                 map.set_Tile(
                                     neighbours[k],
                                     Land,
                                     map.get_Tile(neighbours[k]).get_owner(),
                                     map.get_Tile(neighbours[k]).get_wall(),
-                                    map.get_Tile(neighbours[k]).get_building(),
+                                    Building(Wild,0),
                                     Character(Bandit,true)
                                 );
                             }
@@ -609,22 +623,6 @@ void Game::bandits_turn(){
                         Building(Wild,0),
                         Character(Bandit,true)
                     );
-                    Province province = get_province(coordinates(i,j));
-                    // Give gold to closest camp connect
-                    int closest_distance = 10000;
-                    coordinates closest_camp = coordinates(-1,-1);
-                    for(coordinates province_tile : province.get_locations()){
-                        if(map.get_Tile(province_tile).get_building().get_type() == Town){
-                            // Camp of province
-                            if(hex_distance(province_tile,coordinates(i,j)) < closest_distance){
-                                // Closer than the previous closest
-                                closest_distance = hex_distance(province_tile,coordinates(i,j));
-                                closest_camp = province_tile;
-                            }
-                        }
-                    }
-                    // Add one gold to the closest camp
-                    map.add_gold(closest_camp,1);
                 }
             }
         }
@@ -644,18 +642,19 @@ void Game::bandits_turn(){
                 );
             }
             if(map.get_Tile(coordinates(i,j)).get_building().get_type() == Town &&
-            map.get_Tile(coordinates(i,j)).get_owner() == -1 &&
-            map.get_Tile(coordinates(i,j)).get_building().get_gold()>2){
-                // Spawn bandit
-                map.set_Tile(
-                    coordinates(i,j),
-                    Land,
-                    map.get_Tile(coordinates(i,j)).get_owner(),
-                    map.get_Tile(coordinates(i,j)).get_wall(),
-                    map.get_Tile(coordinates(i,j)).get_building(),
-                    Character(Bandit,false)
-                );
-                map.add_gold(coordinates(i,j),-3);
+            map.get_Tile(coordinates(i,j)).get_owner() == -1){
+                // Bandit camp
+                if(rand() % 3 == 0){
+                    // Spawn bandit
+                    map.set_Tile(
+                        coordinates(i,j),
+                        Land,
+                        map.get_Tile(coordinates(i,j)).get_owner(),
+                        map.get_Tile(coordinates(i,j)).get_wall(),
+                        Building(Town,0),
+                        Character(Bandit,false)
+                    );
+                }
             }
         }
     }
