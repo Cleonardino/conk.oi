@@ -195,6 +195,32 @@ void Game::update_provinces(){
     // }
 }
 
+// Reset selection state
+void Game::reset_select(){
+    bool buying_mode = false;
+    selected_location = coordinates(-1,-1);
+    cursor_infos = Tile::default_Tile();
+    update_provinces();
+    update_select();
+}
+
+// Save the game as a gamestamp and stack it on history
+void Game::save_gamestamp(){
+    history.push(GameStamp(map,active_player_id));
+}
+
+// Load the most recent (top of stack) gamestamp in history. If history is empty, do nothing
+void Game::load_gamestamp(){
+    if(history.empty()){
+        return;
+    }
+    map = history.top().get_map();
+    active_player_id = history.top().get_active_player_id();
+    history.pop();
+    reset_select();
+}
+
+
 int Game::get_active_player_id() const{
     return active_player_id;
 }
@@ -560,6 +586,7 @@ void Game::on_tile_click(coordinates location){
         (map.get_Tile(location).get_character().get_type() == Empty) &&
         (map.get_Tile(location).get_building().get_type() == Wild)){
             // Unit can be placed
+            save_gamestamp();
             place_unit(location);
         }
         cursor_infos = Tile::default_Tile();
@@ -581,6 +608,7 @@ void Game::on_tile_click(coordinates location){
         // A character is selected
         if(valid_destination[location.first][location.second]){
             // Move character
+            save_gamestamp();
             move_character(selected_location,location);
             selected_location = coordinates(-1,-1);
             update_select();
@@ -596,13 +624,14 @@ void Game::on_tile_click(coordinates location){
     update_select();
 }
 
+// When pressing the end turn button
 void Game::on_end_turn(){
     
 }
 
-
+// When pressing the rewind button
 void Game::on_rewind(){
-    
+    load_gamestamp();
 }
 
 // Event function. Called when pressing the peasant purchase button

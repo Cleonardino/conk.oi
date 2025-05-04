@@ -40,6 +40,9 @@ class Game{
     void pay_for(coordinates location, int amount);
     void place_unit(coordinates location);
     void try_retreat(coordinates location);
+    void reset_select();
+    void save_gamestamp();
+    void load_gamestamp();
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);
