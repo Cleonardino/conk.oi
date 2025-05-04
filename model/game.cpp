@@ -84,7 +84,8 @@ bool TileDisplayInfos::get_valid_destination() const{
 
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
-map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile())
+map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile()),
+displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
 {
     selected_location = coordinates(-1,-1);
     update_select();
@@ -260,11 +261,11 @@ bool Game::do_display_panel() const{
 }
 
 int Game::get_displayed_income() const{
-    return 123;
+    return displayed_income;
 }
 
 int Game::get_displayed_gold() const{
-    return 456;
+    return displayed_gold;
 }
 
 
@@ -286,6 +287,15 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
     bool selected = (location==selected_location);
     bool is_province_selected = province_selected[location.first][location.second];
     bool is_valid_destination = valid_destination[location.first][location.second];
+    if(buying_mode){
+        // When in buying mode, valid_destination is only inside the selected province when no character or buildings
+        // are present. Additionnally, no tile appears selected
+        selected = false;
+        is_valid_destination = is_province_selected &&
+        (map.get_Tile(location).get_character().get_type() == Empty) &&
+        (map.get_Tile(location).get_building().get_type() == Wild);
+    }
+    
 
     // Computing walls
     // Wall on left
@@ -426,14 +436,24 @@ void Game::update_select(){
     valid_destination = std::vector<std::vector<bool>>(map.get_height(),std::vector<bool>(map.get_width(),false));
     std::vector<coordinates> tiles_selected = std::vector<coordinates>();
     // Compute new selection
+    bool no_province_selected = true;
     for(Province province : provinces){
         if(province.does_contain(selected_location)){
             // The selected province
+            no_province_selected = false;
+            displayed_gold = province.get_gold();
+            displayed_income = province.get_income();
+            display_panel = true;
             for(coordinates location : province.get_locations()){
                 province_selected[location.first][location.second] = true;
                 tiles_selected.push_back(location);
             }
         }
+    }
+    if(no_province_selected){
+        displayed_gold = 0;
+        displayed_income = 0;
+        display_panel = false;
     }
     std::vector<coordinates> edges;
     // Get neighbours on selected province's edges
@@ -443,6 +463,38 @@ void Game::update_select(){
             valid_destination[edge.first][edge.second] = is_destination_valid(edge);
         }
     }
+}
+
+void Game::move_character(coordinates source, coordinates destination){
+    // Characters always destroy buildings where they move
+    bool has_wall = false;
+    Building building = Building(Wild);
+    Character character = map.get_Tile(source).get_character();
+    // Move the character
+    if(map.get_Tile(destination).get_owner() != active_player_id){
+        // Exhausting character
+        character.exhaust();
+    }
+    // Setting destination tile
+    map.set_Tile(
+        destination,
+        Land,
+        active_player_id,
+        has_wall,
+        building,
+        character
+        );
+    // Removing character from origin tile
+    map.set_Tile(
+        source,
+        Land,
+        active_player_id,
+        map.get_Tile(source).get_wall(),
+        map.get_Tile(source).get_building(),
+        Character(Empty,false)
+        );
+    // Updating provinces
+    update_provinces();
 }
 
 void Game::on_tile_click(coordinates location){
@@ -455,36 +507,9 @@ void Game::on_tile_click(coordinates location){
     if(map.get_Tile(selected_location).get_character().get_type() != Empty){
         // A character is selected
         if(valid_destination[location.first][location.second]){
-            // Characters always destroy buildings where they move
-            bool has_wall = false;
-            Building building = Building(Wild);
-            Character character = map.get_Tile(selected_location).get_character();
-            // Move the character
-            if(map.get_Tile(location).get_owner() != active_player_id){
-                // Exhausting character
-                character.exhaust();
-            }
-            // Setting destination tile
-            map.set_Tile(
-                location,
-                Land,
-                active_player_id,
-                has_wall,
-                building,
-                character
-                );
-            // Removing character from origin tile
-            map.set_Tile(
-                selected_location,
-                Land,
-                active_player_id,
-                map.get_Tile(selected_location).get_wall(),
-                map.get_Tile(selected_location).get_building(),
-                Character(Empty,false)
-                );
+            // Move character
+            move_character(selected_location,location);
             selected_location = coordinates(-1,-1);
-            // Updating provinces
-            update_provinces();
         }
     }
 
@@ -504,22 +529,62 @@ void Game::on_rewind(){
     
 }
 
+// Event function. Called when pressing the peasant purchase button
 void Game::on_peasant_purchase(){
-
+    if(cursor_infos.get_character().get_type() == Peasant){
+        // Unselect
+        buying_mode = false;
+        cursor_infos = Tile::default_Tile();
+    }else{
+        buying_mode = true;
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Peasant,true));
+    }
 }
 
+// Event function. Called when pressing the soldier purchase button
 void Game::on_soldier_purchase(){
-
+    if(cursor_infos.get_character().get_type() == Soldier){
+        // Unselect
+        buying_mode = false;
+        cursor_infos = Tile::default_Tile();
+    }else{
+        buying_mode = true;
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Soldier,true));
+    }
 }
 
+// Event function. Called when pressing the knight purchase button
 void Game::on_knight_purchase(){
-
+    if(cursor_infos.get_character().get_type() == Knight){
+        // Unselect
+        buying_mode = false;
+        cursor_infos = Tile::default_Tile();
+    }else{
+        buying_mode = true;
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Knight,true));
+    }
 }
 
+// Event function. Called when pressing the hero purchase button
 void Game::on_hero_purchase(){
-
+    if(cursor_infos.get_character().get_type() == Hero){
+        // Unselect
+        buying_mode = false;
+        cursor_infos = Tile::default_Tile();
+    }else{
+        buying_mode = true;
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Hero,true));
+    }
 }
 
+// Event function. Called when pressing the fortress purchase button
 void Game::on_fortress_purchase(){
-
+    if(cursor_infos.get_building().get_type() == Fortress){
+        // Unselect
+        buying_mode = false;
+        cursor_infos = Tile::default_Tile();
+    }else{
+        buying_mode = true;
+        cursor_infos = Tile(Land,active_player_id,false,Building(Fortress),Character(Empty,false));
+    }
 }

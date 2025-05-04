@@ -53,6 +53,10 @@ class Game{
     Map map;
     int active_player_id;
     int max_player_count;
+    bool display_panel;
+    int displayed_income;
+    int displayed_gold;
+    bool buying_mode;
     std::vector<Province> provinces;
     coordinates selected_location;
     std::vector<std::vector<bool>> province_selected;
@@ -62,10 +66,12 @@ class Game{
     private:
     void update_provinces();
     void update_select();
+    void update_select_for_placement();
     std::vector<coordinates> get_neighbours_locations(coordinates location) const;
     bool is_destination_valid(coordinates destination) const;
     int get_singular_power_level(coordinates location) const;
     int get_power_level(coordinates location) const;
+    void move_character(coordinates source, coordinates destination);
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);
