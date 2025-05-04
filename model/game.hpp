@@ -57,7 +57,7 @@ class Game{
     coordinates selected_location;
     std::vector<std::vector<bool>> province_selected;
     std::vector<std::vector<bool>> valid_destination;
-    Tile cursor;
+    Tile cursor_infos;
 
     private:
     void update_provinces();
