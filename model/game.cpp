@@ -432,7 +432,7 @@ void Game::pay_for(coordinates location, int amount){
             while(iter != nearest_towns.end() && remaining_amount > 0){
                 // Pay with closest town
                 int amount_payed = std::min(map.get_Tile(*iter).get_building().get_gold(),remaining_amount);
-                map.get_Tile(*iter).get_building().add_gold(-amount_payed);
+                map.add_gold(*iter,-amount_payed);
                 remaining_amount -= amount_payed;
                 std::cout << amount_payed << std::endl;
                 ++iter;
@@ -449,7 +449,7 @@ void Game::move_character(coordinates source, coordinates destination){
         has_wall = has_wall ||
         (map.get_Tile(neighbour).get_building().get_type() != Wild && map.get_Tile(neighbour).get_owner() == active_player_id);
     }
-    Building building = Building(Wild);
+    Building building = Building(Wild,0);
     Character character = map.get_Tile(source).get_character();
     // Move the character
     if(map.get_Tile(destination).get_owner() != active_player_id){
@@ -479,7 +479,6 @@ void Game::move_character(coordinates source, coordinates destination){
 }
 
 void Game::on_tile_click(coordinates location){
-
     // Checking if a character is being bought
     if(buying_mode){
         buying_mode = false;
@@ -510,7 +509,6 @@ void Game::on_tile_click(coordinates location){
         update_select();
         return;
     }
-
     // Checking if unselecting a tile
     if(location == selected_location){
         // Only Unselect
@@ -518,7 +516,6 @@ void Game::on_tile_click(coordinates location){
         update_select();
         return;
     }
-
     // Checking if moving a character
     if(map.get_Tile(selected_location).get_character().get_type() != Empty){
         // A character is selected
@@ -556,7 +553,7 @@ void Game::on_peasant_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Peasant,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Peasant,true));
     }
 }
 
@@ -568,7 +565,7 @@ void Game::on_soldier_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Soldier,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Soldier,true));
     }
 }
 
@@ -580,7 +577,7 @@ void Game::on_knight_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Knight,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Knight,true));
     }
 }
 
@@ -592,7 +589,7 @@ void Game::on_hero_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild),Character(Hero,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Hero,true));
     }
 }
 
@@ -604,6 +601,6 @@ void Game::on_fortress_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Fortress),Character(Empty,false));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Fortress,0),Character(Empty,false));
     }
 }

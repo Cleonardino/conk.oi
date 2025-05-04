@@ -13,5 +13,6 @@ struct Cube {
 Cube coordinates_to_cube(coordinates location);
 int cube_distance(const Cube& a, const Cube& b);
 int hex_distance(coordinates location_a, coordinates location_b);
+void print_debug(int value);
 
 #endif

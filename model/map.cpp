@@ -60,8 +60,8 @@ int Character::get_upkeep(){
 }
 
 // Class constructor
-Building::Building(BuildingType type_):
-type(type_),gold(100)
+Building::Building(BuildingType type_, int gold_):
+type(type_),gold(gold_)
 {}
 
 // Retrn type of building
@@ -108,9 +108,9 @@ Building building_, Character character_):
     building(building_), character(character_)
 {}
 
-// The default Tile, used in map initialisation
+// The default Tile, used in map initialisation and various functions
 Tile Tile::default_Tile(){
-    return Tile(Ocean,-1,false,Wild,Character(Empty,false));
+    return Tile(Ocean,-1,false,Building(Wild,0),Character(Empty,false));
 }
 
 // Update the Tile parameters
@@ -127,17 +127,26 @@ void Tile::update_tile(TileType tile_type_, int owner_id_, bool has_wall_,
 TileType Tile::get_type() const {
     return tile_type;
 }
+
 int Tile::get_owner() const {
     return owner_id;
 }
+
 bool Tile::get_wall() const {
     return has_wall;
 }
-Building Tile::get_building() const {
+
+Building Tile::get_building() const{
     return building;
 }
+
 Character Tile::get_character() const {
     return character;
+}
+
+// Add gold to building on tile
+void Tile::add_gold(int amount){
+    building.add_gold(amount);
 }
 
 // Used for debugging purpose and testing of game's logic
@@ -258,7 +267,7 @@ int Map::get_width() const{
 }
 
 // Get a Tile based on its coordinates
-Tile Map::get_Tile(coordinates location) const {
+Tile Map::get_Tile(coordinates location) const{
     if(location.first == -1 ||location.second == -1){
         return Tile::default_Tile();
     }
@@ -286,4 +295,8 @@ std::ostream& operator<<(std::ostream& os, const Map& map) {
         }
     }
     return os;
+}
+
+void Map::add_gold(coordinates location, int amount){
+    data[location.first][location.second].add_gold(amount);
 }

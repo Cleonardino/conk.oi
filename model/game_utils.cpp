@@ -18,8 +18,14 @@ int cube_distance(const Cube& a, const Cube& b){
     return std::max(abs(a.x - b.x), std::max(abs(a.y - b.y), abs(a.z - b.z)));
 }
 
+// Calculate distance between two coordinates
 int hex_distance(coordinates location_a, coordinates location_b){
     Cube a = coordinates_to_cube(location_a);
     Cube b = coordinates_to_cube(location_b);
     return cube_distance(a, b);
+}
+
+// Print number on a new line
+void print_debug(int value){
+    std::cout << value << std::endl;
 }

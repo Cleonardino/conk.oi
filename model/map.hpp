@@ -49,7 +49,7 @@ class Building{
     int gold;
 
     public:
-    Building(BuildingType type_);
+    Building(BuildingType type_, int gold_);
     BuildingType get_type() const;
     int get_gold() const;
     void add_gold(int amount);
@@ -81,6 +81,7 @@ class Tile{
     bool get_wall() const;
     Building get_building() const;
     Character get_character() const;
+    void add_gold(int amount);
 
     friend std::ostream& operator<<(std::ostream& os, const Tile& tile);
 };
@@ -100,7 +101,7 @@ class Map{
     Tile get_Tile(coordinates location) const;
     void set_Tile(coordinates location, TileType tile_type, int owner_id,
         bool has_wall, Building building, Character character);
-
+    void add_gold(coordinates location, int amount);
     friend std::ostream& operator<<(std::ostream& os, const Map& map);
 };
 

@@ -123,7 +123,7 @@ Map parse_csv(std::string filepath) {
 
                 // Update tile
                 result.set_Tile(coordinates(cur_row, cur_column), tile_type, owner_id,
-                    false, Building(building_type), Character(character_type,false));
+                    false, Building(building_type,40), Character(character_type,false));
                     
                 cur_column++;
             }
