@@ -1,5 +1,7 @@
 #include "game.hpp"
 
+
+
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile()),
@@ -214,12 +216,6 @@ int Game::get_displayed_gold() const{
     return displayed_gold;
 }
 
-bool does_wall_connect(Map map, coordinates location, coordinates adjacent_tile){
-    return (map.get_Tile(adjacent_tile).get_wall() &&
-    map.get_Tile(adjacent_tile).get_owner() == 
-    map.get_Tile(location).get_owner());
-}
-
 TileDisplayInfos Game::get_cursor_infos() const{
     return TileDisplayInfos(cursor_infos,std::vector(6,true),false,false,false);
 }
@@ -307,7 +303,7 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
     return os;
 }
 
-bool Game::is_destination_valid(coordinates destination) const{
+bool Game::is_possible_to_move(coordinates destination) const{
     // If no character is selected,the character is sleeping or the
     // selected tile don't belong to the active player, no destination is marked as valid
     if(map.get_Tile(selected_location).get_owner() != active_player_id ||
@@ -411,7 +407,7 @@ void Game::update_select(){
     for(coordinates location : tiles_selected){
         edges = get_neighbours_locations(location);
         for(coordinates edge : edges){
-            valid_destination[edge.first][edge.second] = is_destination_valid(edge);
+            valid_destination[edge.first][edge.second] = is_possible_to_move(edge);
         }
     }
 }
@@ -460,6 +456,28 @@ void Game::on_tile_click(coordinates location){
         update_select();
         return;
     }
+    if(cursor_infos.get_character().get_type() != Empty ||
+    cursor_infos.get_building().get_type() != Wild){
+        // Something is being buyed, trying to place it
+        if(valid_destination[location.first][location.second]){
+            // Place unit
+            map.set_Tile(
+                location,
+                Land,
+                active_player_id,
+                map.get_Tile(location).get_wall(),
+                cursor_infos.get_building(),
+                cursor_infos.get_character()
+            );
+            // Remove gold
+            for(Province province : provinces){
+                if(province.does_contain(selected_location)){
+                    // Selected province, find closest city
+                }
+            }
+        }
+    }
+
     if(map.get_Tile(selected_location).get_character().get_type() != Empty){
         // A character is selected
         if(valid_destination[location.first][location.second]){

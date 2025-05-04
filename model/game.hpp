@@ -7,6 +7,7 @@
 #include "game_constants.hpp"
 #include "province.hpp"
 #include "tiledisplayinfo.hpp"
+#include "game_utils.hpp"
 
 // A class containing all the informations of the current game's state as well as the map.
 class Game{
@@ -29,7 +30,7 @@ class Game{
     void update_select();
     void update_select_for_placement();
     std::vector<coordinates> get_neighbours_locations(coordinates location) const;
-    bool is_destination_valid(coordinates destination) const;
+    bool is_possible_to_move(coordinates destination) const;
     int get_singular_power_level(coordinates location) const;
     int get_power_level(coordinates location) const;
     void move_character(coordinates source, coordinates destination);
