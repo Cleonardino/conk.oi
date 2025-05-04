@@ -8,4 +8,12 @@
 #define KNIGHT_POWER 3
 #define HERO_POWER 4
 
+#define PEASANT_COST 10
+#define SOLDIER_COST 20
+#define KNIGHT_COST 40
+#define HERO_COST 80
+
+
+#define FORTRESS_COST 20
+
 #endif
