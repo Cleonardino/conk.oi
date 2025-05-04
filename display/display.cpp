@@ -84,6 +84,7 @@ void Display::initMap()
         textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/soldier.png");
         textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/tiles/land.png");
         textures[PLAYER_TURN_INDICATION][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/buttons/player_turn_indication.png");
+        textures[VICTORY_SIGN][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/buttons/victory_sign.png");
     }
     textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer.get());
     textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer.get());
@@ -110,6 +111,10 @@ void Display::handleEvents()
                 isRunning = false;
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                if (game.get_finished())
+                {
+                    break;
+                }
                 int x;
                 int y;
                 int mat_i;
@@ -212,6 +217,10 @@ void Display::handleEvents()
                 }
                 break;
             case SDL_KEYDOWN:
+                if (game.get_finished())
+                {
+                    break;
+                }
                 switch (event.key.keysym.sym)
                 {
                     case SDLK_LEFT:  window_center.first += 10; break;
@@ -268,6 +277,10 @@ void Display::render()
         this->DrawPlayerIndicator();
         this->DrawReturnSign();
         this->DrawUnderCursor(game.get_cursor_infos());
+        if (game.get_finished())
+        {
+            this->DrawVictory();
+        }
     }
     else if (inLevelSelection)
     {
@@ -282,6 +295,18 @@ void Display::render()
         this->DrawLevel();
     }
     SDL_RenderPresent(renderer.get());
+}
+
+void Display::DrawVictory()
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
+    dest.w = 96 * BUTTON_ZOOM * 2;
+    dest.h = 32 * BUTTON_ZOOM * 2;
+    dest.x = (window_w - dest.w)/2;
+    dest.y = (window_h - dest.h)/2;
+    TextureManager::Draw(renderer.get(), textures[VICTORY_SIGN][game.get_active_player_id()].get(), &dest);
 }
 
 void Display::DrawBackground(int to_draw)
