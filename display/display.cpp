@@ -59,46 +59,45 @@ void Display::initMap()
     SDL_GetWindowSize(window.get(), &window_w, &window_h);
     window_h = window_h - BUTTON_Y_SIZE;
     actu_hexa_size = std::min(window_w/(map_row_size+1), window_h/map_col_size * 32/19);
-    std::cout << actu_hexa_size << std::endl;
     textures[BASE_TILE][0] = TileManager::LoadTile(BASE_TILE, renderer.get());
     textures[FOREST_TILE][0] = TileManager::LoadTile(FOREST_TILE, renderer.get());
     textures[OCEAN_TILE][0] = TileManager::LoadTile(OCEAN_TILE, renderer.get());
-    textures[BARRIER_TILE_BL][0] = TextureManager::LoadTexture("../art/tiles/wall_bl.png", renderer.get());
-    textures[BARRIER_TILE_BR][0] = TextureManager::LoadTexture("../art/tiles/wall_br.png", renderer.get());
-    textures[BARRIER_TILE_L][0] = TextureManager::LoadTexture("../art/tiles/wall_l.png", renderer.get());
-    textures[BARRIER_TILE_R][0] = TextureManager::LoadTexture("../art/tiles/wall_r.png", renderer.get());
-    textures[BARRIER_TILE_TL][0] = TextureManager::LoadTexture("../art/tiles/wall_tl.png", renderer.get());
-    textures[BARRIER_TILE_TR][0] = TextureManager::LoadTexture("../art/tiles/wall_tr.png", renderer.get());
-    textures[CAMP_TILE][0] = TextureManager::LoadTexture("../art/tiles/camp.png", renderer.get());
-    textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("../art/tiles/province_selected.png", renderer.get());
-    textures[SELECTED_TILE][0] = TextureManager::LoadTexture("../art/tiles/selected.png", renderer.get());
-    textures[BANDIT_TILE][0] = TextureManager::LoadTexture("../art/characters/bandit.png", renderer.get());
+    textures[BARRIER_TILE_BL][0] = TextureManager::LoadTexture("./art/tiles/wall_bl.png", renderer.get());
+    textures[BARRIER_TILE_BR][0] = TextureManager::LoadTexture("./art/tiles/wall_br.png", renderer.get());
+    textures[BARRIER_TILE_L][0] = TextureManager::LoadTexture("./art/tiles/wall_l.png", renderer.get());
+    textures[BARRIER_TILE_R][0] = TextureManager::LoadTexture("./art/tiles/wall_r.png", renderer.get());
+    textures[BARRIER_TILE_TL][0] = TextureManager::LoadTexture("./art/tiles/wall_tl.png", renderer.get());
+    textures[BARRIER_TILE_TR][0] = TextureManager::LoadTexture("./art/tiles/wall_tr.png", renderer.get());
+    textures[CAMP_TILE][0] = TextureManager::LoadTexture("./art/tiles/camp.png", renderer.get());
+    textures[PROVINCE_SELECTED][0] = TextureManager::LoadTexture("./art/tiles/province_selected.png", renderer.get());
+    textures[SELECTED_TILE][0] = TextureManager::LoadTexture("./art/tiles/selected.png", renderer.get());
+    textures[BANDIT_TILE][0] = TextureManager::LoadTexture("./art/characters/bandit.png", renderer.get());
     int nb_players = game.get_max_player_count();
     for (int i = -1; i < nb_players; i++)
     {
-        textures[FORTRESS_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/tiles/fortress.png");
-        textures[TOWN_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/tiles/town.png");
-        textures[PEASANT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/peasant.png");
-        textures[HERO_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/hero.png");
-        textures[KNIGHT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/knight.png");
-        textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"../art/characters/soldier.png");
-        textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/tiles/land.png");
-        textures[PLAYER_TURN_INDICATION][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/buttons/player_turn_indication.png");
-        textures[VICTORY_SIGN][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "../art/buttons/victory_sign.png");
+        textures[FORTRESS_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/tiles/fortress.png");
+        textures[TOWN_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/tiles/town.png");
+        textures[PEASANT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/characters/peasant.png");
+        textures[HERO_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/characters/hero.png");
+        textures[KNIGHT_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/characters/knight.png");
+        textures[SOLDIER_TILE][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(),"./art/characters/soldier.png");
+        textures[PLAYERS_TILES][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "./art/tiles/land.png");
+        textures[PLAYER_TURN_INDICATION][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "./art/buttons/player_turn_indication.png");
+        textures[VICTORY_SIGN][i] = TileManager::LoadTileforPlayer(i, nb_players, renderer.get(), "./art/buttons/victory_sign.png");
     }
-    textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/end_turn_sign.png", renderer.get());
-    textures[REWIND_SIGN][0] = TextureManager::LoadTexture("../art/buttons/rewind_sign.png", renderer.get());
-    textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/play.png", renderer.get());
-    textures[LEVEL_BUTTON][0] = TextureManager::LoadTexture("../art/buttons/levels_sign.png", renderer.get());
-    textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("../art/tiles/valid_dest.png", renderer.get());
-    textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("../art/characters/sleeping.png", renderer.get());
-    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("../art/buttons/province_panel.png", renderer.get());
-    textures[NUMBERS][0] = TextureManager::LoadTexture("../art/font/numbers.png", renderer.get());
-    textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer.get());
-    textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer.get());
-    textures[RETURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/return.png", renderer.get());
-    textures[MAIN_MENU_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/mainmenu_background.png", renderer.get());
-    textures[LEVEL_SELECTOR_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/level_selector_background.png", renderer.get());
+    textures[END_TURN_SIGN][0] = TextureManager::LoadTexture("./art/buttons/end_turn_sign.png", renderer.get());
+    textures[REWIND_SIGN][0] = TextureManager::LoadTexture("./art/buttons/rewind_sign.png", renderer.get());
+    textures[PLAY_BUTTON][0] = TextureManager::LoadTexture("./art/buttons/play.png", renderer.get());
+    textures[LEVEL_BUTTON][0] = TextureManager::LoadTexture("./art/buttons/levels_sign.png", renderer.get());
+    textures[VALID_DESTINATION][0] = TextureManager::LoadTexture("./art/tiles/valid_dest.png", renderer.get());
+    textures[SLEEPING_CHAR][0] = TextureManager::LoadTexture("./art/characters/sleeping.png", renderer.get());
+    textures[PROVINCE_PANEL][0] = TextureManager::LoadTexture("./art/buttons/province_panel.png", renderer.get());
+    textures[NUMBERS][0] = TextureManager::LoadTexture("./art/font/numbers.png", renderer.get());
+    textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("./art/buttons/panel_selected.png", renderer.get());
+    textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("./art/buttons/one_level_background.png", renderer.get());
+    textures[RETURN_SIGN][0] = TextureManager::LoadTexture("./art/buttons/return.png", renderer.get());
+    textures[MAIN_MENU_BACKGROUND][0] = TextureManager::LoadTexture("./art/buttons/mainmenu_background.png", renderer.get());
+    textures[LEVEL_SELECTOR_BACKGROUND][0] = TextureManager::LoadTexture("./art/buttons/level_selector_background.png", renderer.get());
 }
 
 void Display::handleEvents()
@@ -177,25 +176,25 @@ void Display::handleEvents()
                         switch (level_seletion)
                         {
                         case 1:
-                            map = parse_csv("../example_map.txt");
+                            map = parse_csv("./example_map.txt");
                             game = Game(map,0,std::vector<Province>());
                             inLevelSelection = false;
                             initMap();
                             break;
                         case 2:
-                            map = parse_csv("../map_level_2.txt");
+                            map = parse_csv("./map_level_2.txt");
                             game = Game(map,0,std::vector<Province>());
                             inLevelSelection = false;
                             initMap();
                             break;
                         case 3:
-                            map = parse_csv("../map_level_3.txt");
+                            map = parse_csv("./map_level_3.txt");
                             game = Game(map,0,std::vector<Province>());
                             inLevelSelection = false;
                             initMap();
                             break;
                         case 4:
-                            map = parse_csv("../map_level_4.txt");
+                            map = parse_csv("./map_level_4.txt");
                             game = Game(map,0,std::vector<Province>());
                             inLevelSelection = false;
                             initMap();

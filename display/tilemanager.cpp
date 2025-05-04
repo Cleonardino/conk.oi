@@ -86,9 +86,9 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, T
 
 TexturePtr TileManager::LoadTile(const int tile_id, SDL_Renderer* renderer)
 {
-    std::map<int, const char*> id_to_tilename { {BASE_TILE, "../art/tiles/base_tile.png"},
-                                                {FOREST_TILE, "../art/tiles/forest.png"},
-                                                {OCEAN_TILE, "../art/tiles/ocean.png"}};
+    std::map<int, const char*> id_to_tilename { {BASE_TILE, "./art/tiles/base_tile.png"},
+                                                {FOREST_TILE, "./art/tiles/forest.png"},
+                                                {OCEAN_TILE, "./art/tiles/ocean.png"}};
     TexturePtr tile_tex = TextureManager::LoadTexture(id_to_tilename[tile_id], renderer);
 
     return tile_tex;

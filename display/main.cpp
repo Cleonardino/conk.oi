@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    Map new_map = parse_csv("../example_map.txt");
+    Map new_map = parse_csv("./example_map.txt");
     Game new_game = Game(new_map,0,std::vector<Province>());
     Display display = Display(new_game, new_map);
 
