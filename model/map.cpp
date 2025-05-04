@@ -74,6 +74,11 @@ int Building::get_gold() const{
     return gold;
 }
 
+// Add gold to building. amount may be negative
+void Building::add_gold(int amount){
+    gold += amount;
+}
+
 // Get cost of building
 int Building::get_cost(){
     switch (type)

@@ -52,6 +52,7 @@ class Building{
     Building(BuildingType type_);
     BuildingType get_type() const;
     int get_gold() const;
+    void add_gold(int amount);
     int get_cost();
     int get_upkeep();
 };

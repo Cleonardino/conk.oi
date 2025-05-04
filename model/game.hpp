@@ -35,6 +35,7 @@ class Game{
     int get_power_level(coordinates location) const;
     void move_character(coordinates source, coordinates destination);
     void set_wall(coordinates location, bool value);
+    void pay_for(coordinates location, int amount);
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);

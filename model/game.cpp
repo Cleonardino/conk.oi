@@ -412,6 +412,35 @@ void Game::update_select(){
     }
 }
 
+void Game::pay_for(coordinates location, int amount){
+    std::vector<coordinates> nearest_towns = std::vector<coordinates>();
+    int remaining_amount = amount;
+    for(Province province : provinces){
+        if(province.does_contain(selected_location)){
+            // Selected province, retrieve towns ordered by distance
+            for(coordinates province_tile : province.get_locations()){
+                if(map.get_Tile(province_tile).get_building().get_type() == Town){
+                    // Town of province, insert in vector with
+                    auto iter = nearest_towns.begin();
+                    while (iter != nearest_towns.end() && hex_distance(*iter,location) < hex_distance(province_tile,location)) {
+                        ++iter;
+                    }
+                    nearest_towns.insert(iter, province_tile);
+                }
+            }
+            auto iter = nearest_towns.begin();
+            while(iter != nearest_towns.end() && remaining_amount > 0){
+                // Pay with closest town
+                int amount_payed = std::min(map.get_Tile(*iter).get_building().get_gold(),remaining_amount);
+                map.get_Tile(*iter).get_building().add_gold(-amount_payed);
+                remaining_amount -= amount_payed;
+                std::cout << amount_payed << std::endl;
+                ++iter;
+            }
+        }
+    }
+}
+
 void Game::move_character(coordinates source, coordinates destination){
     // Characters always destroy buildings where they move
     bool has_wall = false;
@@ -450,16 +479,15 @@ void Game::move_character(coordinates source, coordinates destination){
 }
 
 void Game::on_tile_click(coordinates location){
-    if(location == selected_location){
-        // Only Unselect
-        selected_location = coordinates(-1,-1);
-        update_select();
-        return;
-    }
-    if(cursor_infos.get_character().get_type() != Empty ||
-    cursor_infos.get_building().get_type() != Wild){
+
+    // Checking if a character is being bought
+    if(buying_mode){
+        buying_mode = false;
         // Something is being buyed, trying to place it
-        if(valid_destination[location.first][location.second]){
+        if(province_selected[location.first][location.second] &&
+        (map.get_Tile(location).get_character().get_type() == Empty) &&
+        (map.get_Tile(location).get_building().get_type() == Wild)){
+            // Unit can be placed
             // Place unit
             map.set_Tile(
                 location,
@@ -470,27 +498,40 @@ void Game::on_tile_click(coordinates location){
                 cursor_infos.get_character()
             );
             // Remove gold
-            int to_pay = 
-            for(Province province : provinces){
-                if(province.does_contain(selected_location)){
-                    // Selected province
-                }
-            }
-        }else{
-            cursor_infos = Tile::default_Tile();
-            selected_location = coordinates(-1,-1);
+            int to_pay = 0;
+            to_pay += cursor_infos.get_character().get_cost();
+            to_pay += cursor_infos.get_building().get_cost();
+            pay_for(location,to_pay);
         }
+        cursor_infos = Tile::default_Tile();
+        selected_location = coordinates(-1,-1);
+        // Calculate province upkeep and gold again
+        update_provinces();
+        update_select();
+        return;
     }
 
+    // Checking if unselecting a tile
+    if(location == selected_location){
+        // Only Unselect
+        selected_location = coordinates(-1,-1);
+        update_select();
+        return;
+    }
+
+    // Checking if moving a character
     if(map.get_Tile(selected_location).get_character().get_type() != Empty){
         // A character is selected
         if(valid_destination[location.first][location.second]){
             // Move character
             move_character(selected_location,location);
             selected_location = coordinates(-1,-1);
+            update_select();
+            return;
         }
     }
 
+    // Classic select
     if(map.get_Tile(location).get_type() == Land){
         selected_location = location;
     }
