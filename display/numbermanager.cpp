@@ -1,7 +1,7 @@
 #include "numbermanager.hpp"
 #define MAX_NUMBER_SEEN 3
 
-void NumberManager::DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int to_draw)
+void NumberManager::DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int to_draw)
 {
     SDL_Rect srcRect;
     if (to_draw == -1)
@@ -15,10 +15,10 @@ void NumberManager::DrawOneNumber(SDL_Renderer* renderer, std::map<int, std::map
     srcRect.y = 0;
     srcRect.w = 6;         // Largeur de la sous-image
     srcRect.h = 9;
-    SDL_RenderCopy(renderer, textures[NUMBERS][0], &srcRect, dest);
+    SDL_RenderCopy(renderer, textures[NUMBERS][0].get(), &srcRect, dest);
 }
 
-void NumberManager::DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int to_draw)
+void NumberManager::DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int to_draw)
 {
     SDL_Rect one_number_dest;
     one_number_dest.w = 6 * BUTTON_ZOOM;
@@ -41,7 +41,7 @@ void NumberManager::DrawNumbers(SDL_Renderer* renderer, std::map<int, std::map<i
     }
 }
 
-void NumberManager::DrawMoneyRecap(SDL_Renderer* renderer, std::map<int, std::map<int, SDL_Texture*>> textures, SDL_Rect *dest, int money, int gain)
+void NumberManager::DrawMoneyRecap(SDL_Renderer* renderer, std::map<int, std::map<int, TexturePtr>> textures, SDL_Rect *dest, int money, int gain)
 {
     SDL_Rect dest_money, dest_gain;
     dest_money.x = dest->x + (32-18)/2 * BUTTON_ZOOM;
