@@ -341,20 +341,26 @@ void Display::DrawButton()
 
 void Display::DrawProvincePanel()
 {
-    int player_turn_id = game.get_active_player_id(); // Placeholder
+    int player_turn_id = game.get_active_player_id();
     int to_restore = dest.x;
+    int gold = game.get_displayed_gold();
     dest.w = PROVINCE_PANEL_SIZE;
     TextureManager::Draw(renderer, textures[PROVINCE_PANEL][0], &dest);
     dest.w = 32 * BUTTON_ZOOM;
-    DrawPanelButton(textures[PEASANT_TILE][player_turn_id], 10, 0);//Placeholders for price
+    if (gold >= PEASANT_COST)
+        DrawPanelButton(textures[PEASANT_TILE][player_turn_id], PEASANT_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
-    DrawPanelButton(textures[SOLDIER_TILE][player_turn_id], 9, 0);//Placeholders for price
+    if (gold >= SOLDIER_COST)
+        DrawPanelButton(textures[SOLDIER_TILE][player_turn_id], SOLDIER_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
-    DrawPanelButton(textures[KNIGHT_TILE][player_turn_id], 8, 0);//Placeholders for price
+    if (gold >= KNIGHT_COST)
+        DrawPanelButton(textures[KNIGHT_TILE][player_turn_id], KNIGHT_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
-    DrawPanelButton(textures[HERO_TILE][player_turn_id], 7, 0);//Placeholders for price
+    if (gold >= HERO_COST)
+        DrawPanelButton(textures[HERO_TILE][player_turn_id], HERO_COST, 0);
     dest.x += 32 * BUTTON_ZOOM;
-    DrawPanelButton(textures[FORTRESS_TILE][player_turn_id], 6, 4 * BUTTON_ZOOM);//Placeholders for price
+    if (gold >= FORTRESS_COST)
+        DrawPanelButton(textures[FORTRESS_TILE][player_turn_id], FORTRESS_COST, 4 * BUTTON_ZOOM);
     dest.x += 36 * BUTTON_ZOOM;
     NumberManager::DrawMoneyRecap(renderer, textures, &dest, game.get_displayed_gold(), game.get_displayed_income());
     dest.x = to_restore;
@@ -409,16 +415,16 @@ void Display::DrawUnderCursor(TileDisplayInfos to_draw)
     switch (to_draw.get_Tile().get_character().get_type())
     {
         case Peasant:
-            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer, textures[PEASANT_TILE][game.get_active_player_id()], &dest);
             break;
         case Soldier:
             TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
             break;
         case Knight:
-            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer, textures[KNIGHT_TILE][game.get_active_player_id()], &dest);
             break;
         case Hero:
-            TextureManager::Draw(renderer, textures[SOLDIER_TILE][game.get_active_player_id()], &dest);
+            TextureManager::Draw(renderer, textures[HERO_TILE][game.get_active_player_id()], &dest);
             break;
     }
 }
@@ -435,6 +441,7 @@ bool Display::InProvincePanel(int posx, int posy, int *tile_on)
     int posx_mouse = posx - dest.x;
     int posy_mouse = posy - dest.y;
     int in_panel = -1;
+    int gold = game.get_displayed_gold();
     for (int i = 0; i < 5;i++)
     {
         if (posx_mouse >= 0 + dest.w * i and posx_mouse <= dest.w * (i+1) and posy_mouse >= 0)
@@ -447,24 +454,19 @@ bool Display::InProvincePanel(int posx, int posy, int *tile_on)
     {
     case 0:
         *tile_on = PEASANT_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest); 
-        return true;
+        return gold >= PEASANT_COST;
     case 1:
         *tile_on = SOLDIER_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
-        return true;
+        return gold >= SOLDIER_COST;
     case 2:
         *tile_on = KNIGHT_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
-        return true;
+        return gold >= KNIGHT_COST;
     case 3:
         *tile_on = HERO_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
-        return true;
+        return gold >= HERO_COST;
     case 4:
         *tile_on = FORTRESS_TILE;
-        TextureManager::Draw(renderer, textures[PANEL_SELECTED][0], &dest);
-        return true;
+        return gold >= FORTRESS_COST;
     default:
         return false;
     }
