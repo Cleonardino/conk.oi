@@ -5,7 +5,7 @@
 // Class constructor
 Game::Game(Map map_, int active_player_id_, std::vector<Province> provinces_):
 map(map_), active_player_id(active_player_id_), provinces(provinces_), cursor_infos(Tile::default_Tile()),
-displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false)
+displayed_income(0), displayed_gold(0), display_panel(false), buying_mode(false), history()
 {
     selected_location = coordinates(-1,-1);
     update_select();

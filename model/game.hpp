@@ -8,6 +8,7 @@
 #include "province.hpp"
 #include "tiledisplayinfo.hpp"
 #include "game_utils.hpp"
+#include "gamestamp.hpp"
 
 // A class containing all the informations of the current game's state as well as the map.
 class Game{
@@ -24,6 +25,7 @@ class Game{
     std::vector<std::vector<bool>> province_selected;
     std::vector<std::vector<bool>> valid_destination;
     Tile cursor_infos;
+    std::stack<GameStamp> history;
 
     private:
     void update_provinces();
