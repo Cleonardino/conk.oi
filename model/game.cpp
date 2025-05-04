@@ -307,8 +307,13 @@ void Game::load_gamestamp(){
 
 // Return true if the player with id id is alive
 bool Game::is_player_alive(int id){
-    // To complete
-    return true;
+    // A player is alive if they have at least one province
+    for(Province province : provinces){
+        if(province.get_owner() == id){
+            return true;
+        }
+    }
+    return false;
 }
 
 // Set next player id to next alive player or -1 if is last player. Set finished to true if only one player remain
@@ -430,7 +435,6 @@ TileDisplayInfos Game::get_display_infos(coordinates location) const{
         }
     }
 
-    // To complete
     return TileDisplayInfos(map.get_Tile(location), walls, selected, is_province_selected, is_valid_destination);
 }
 
