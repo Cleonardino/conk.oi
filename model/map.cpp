@@ -26,7 +26,7 @@ void Character::refresh(){
 }
 
 // Get cost of character
-int Character::get_cost(){
+int Character::get_cost() const{
     switch (type)
     {
     case Peasant:
@@ -43,7 +43,7 @@ int Character::get_cost(){
 }
 
 // Get upkeep cost of character
-int Character::get_upkeep(){
+int Character::get_upkeep() const{
     switch (type)
     {
     case Peasant:
@@ -56,6 +56,22 @@ int Character::get_upkeep(){
         return HERO_UPKEEP;
     default:
         return 0;
+    }
+}
+
+// Upgrade character to next rank
+void Character::upgrade(){
+    switch (type)
+    {
+    case Peasant:
+        type = Soldier;
+        return;
+    case Soldier:
+        type = Knight;
+        return;
+    case Knight:
+        type = Hero;
+        return;
     }
 }
 

@@ -458,9 +458,16 @@ bool Game::is_possible_to_move(coordinates destination) const{
     }
 
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
-        // Same owner, valid only if empty
-        return (map.get_Tile(destination).get_character().get_type() == Empty &&
-        map.get_Tile(destination).get_building().get_type() == Wild);
+        // Same owner, valid only if empty or with same character except hero
+        return (
+            (
+                map.get_Tile(destination).get_character().get_type() == Empty ||
+                map.get_Tile(destination).get_character().get_type() == map.get_Tile(selected_location).get_character().get_type()
+            )
+            &&
+            map.get_Tile(destination).get_character().get_type() != Hero &&
+            map.get_Tile(destination).get_building().get_type() == Wild
+            );
     }
 
     // Tile to attack, check if the power level is sufficient
@@ -620,6 +627,7 @@ void Game::move_character(coordinates source, coordinates destination){
     bool building_destroyed = false;
     // Move the character
     if(map.get_Tile(destination).get_owner() != active_player_id){
+        // Attacking tile doesn't belonging to the player
         // Exhausting character
         character.exhaust();
         // Checking if a building is being destroyed
@@ -631,7 +639,19 @@ void Game::move_character(coordinates source, coordinates destination){
         ){
             try_retreat(destination);
         }
+    }else{
+        // Moving to tile inside province
+        if(map.get_Tile(destination).get_character().get_type() == map.get_Tile(source).get_character().get_type()){
+            // Fusion, upgrade character
+            character.upgrade();
+            if(map.get_Tile(destination).get_character().get_has_moved()){
+                // If fusion material has moved, exhaust
+                character.exhaust();
+            }
+        }
+        
     }
+
     // Setting destination tile. Characters always destroy buildings where they move
     map.set_Tile(
         destination,
@@ -769,7 +789,7 @@ void Game::on_peasant_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Peasant,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Peasant,false));
     }
 }
 
@@ -781,7 +801,7 @@ void Game::on_soldier_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Soldier,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Soldier,false));
     }
 }
 
@@ -793,7 +813,7 @@ void Game::on_knight_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Knight,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Knight,false));
     }
 }
 
@@ -805,7 +825,7 @@ void Game::on_hero_purchase(){
         cursor_infos = Tile::default_Tile();
     }else{
         buying_mode = true;
-        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Hero,true));
+        cursor_infos = Tile(Land,active_player_id,false,Building(Wild,0),Character(Hero,false));
     }
 }
 

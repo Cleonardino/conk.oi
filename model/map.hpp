@@ -33,8 +33,9 @@ class Character{
     bool get_has_moved() const;
     void exhaust();
     void refresh();
-    int get_cost();
-    int get_upkeep();
+    int get_cost() const;
+    int get_upkeep() const;
+    void upgrade();
 };
 
 enum BuildingType {
