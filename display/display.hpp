@@ -42,6 +42,7 @@ class Display {
     void DrawLevelSelector();
     void DrawUnderCursor(TileDisplayInfos to_draw);
     void DrawReturnSign();
+    void DrawBackground(int to_draw);
     bool InReturnSign(int posx, int posy);
     bool InLevelSelector(int posx, int posy, int *level_selected);
     bool InLevel(int posx, int posy);

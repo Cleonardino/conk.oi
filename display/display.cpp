@@ -96,6 +96,8 @@ void Display::initMap()
     textures[PANEL_SELECTED][0] = TextureManager::LoadTexture("../art/buttons/panel_selected.png", renderer.get());
     textures[ONE_LEVEL_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/one_level_background.png", renderer.get());
     textures[RETURN_SIGN][0] = TextureManager::LoadTexture("../art/buttons/return.png", renderer.get());
+    textures[MAIN_MENU_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/mainmenu_background.png", renderer.get());
+    textures[LEVEL_SELECTOR_BACKGROUND][0] = TextureManager::LoadTexture("../art/buttons/level_selector_background.png", renderer.get());
 }
 
 void Display::handleEvents()
@@ -260,6 +262,7 @@ void Display::render()
     SDL_RenderClear(renderer.get());
     if (nowPlaying)
     {
+        this->DrawBackground(IN_GAME_BACKGROUND);
         this->DrawMap();
         this->DrawButton();
         this->DrawPlayerIndicator();
@@ -268,15 +271,35 @@ void Display::render()
     }
     else if (inLevelSelection)
     {
+        this->DrawBackground(LEVEL_SELECTOR_BACKGROUND);
         this->DrawLevelSelector();
         this->DrawReturnSign();
     }
     else
     {
+        this->DrawBackground(MAIN_MENU_BACKGROUND);
         this->DrawPlay();
         this->DrawLevel();
     }
     SDL_RenderPresent(renderer.get());
+}
+
+void Display::DrawBackground(int to_draw)
+{
+    int window_w;
+    int window_h;
+    SDL_GetWindowSize(window.get(), &window_w, &window_h);
+    dest.w = window_w;
+    dest.h = window_h;
+    dest.x = dest.y = 0;
+    if (to_draw == MAIN_MENU_BACKGROUND)
+    {
+        TextureManager::Draw(renderer.get(), textures[MAIN_MENU_BACKGROUND][0].get(), &dest);
+    }
+    else if (to_draw == LEVEL_SELECTOR_BACKGROUND)
+    {
+        TextureManager::Draw(renderer.get(), textures[LEVEL_SELECTOR_BACKGROUND][0].get(), &dest);
+    }
 }
 
 void Display::DrawMap()
@@ -637,7 +660,7 @@ void Display::DrawLevelSelector()
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = (window_w - 5 * dest.w)/6;
-    dest.y = dest.h;
+    dest.y = (window_h - dest.h * (LEVEL_NUMBER/5))/2;
     for (int i = 1; i <= LEVEL_NUMBER; i++)
     {
         TextureManager::Draw(renderer.get(), textures[ONE_LEVEL_BACKGROUND][0].get(), &dest);
@@ -663,7 +686,7 @@ bool Display::InLevelSelector(int posx, int posy, int *level_selected)
     dest.w = 32 * BUTTON_ZOOM;
     dest.h = 32 * BUTTON_ZOOM;
     dest.x = (window_w - 5 * dest.w)/6;
-    dest.y = dest.h;
+    dest.y = (window_h - dest.h * (LEVEL_NUMBER/5))/2;
     for (int i = 1; i <= LEVEL_NUMBER; i++)
     {
         if (posx - dest.x >= 0 and posx - dest.x <= dest.w and posy - dest.y >= 0 and posy - dest.y <= dest.h)
