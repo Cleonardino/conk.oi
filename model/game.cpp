@@ -442,27 +442,29 @@ void Game::pay_for(coordinates location, int amount){
 }
 
 void Game::move_character(coordinates source, coordinates destination){
-    // Characters always destroy buildings where they move
     bool has_wall = false;
     // Checking if a building belonging to the player is nearby, adding walls if true
     for(coordinates neighbour : get_neighbours_locations(destination)){
         has_wall = has_wall ||
-        (map.get_Tile(neighbour).get_building().get_type() != Wild && map.get_Tile(neighbour).get_owner() == active_player_id);
+        (map.get_Tile(neighbour).get_building().get_type() != Wild &&
+        map.get_Tile(neighbour).get_owner() == active_player_id);
     }
-    Building building = Building(Wild,0);
     Character character = map.get_Tile(source).get_character();
+    bool building_destroyed = false;
     // Move the character
     if(map.get_Tile(destination).get_owner() != active_player_id){
         // Exhausting character
         character.exhaust();
+        // Checking if a building is being destroyed
+         building_destroyed = (map.get_Tile(destination).get_building().get_type() != Wild);
     }
-    // Setting destination tile
+    // Setting destination tile. Characters always destroy buildings where they move
     map.set_Tile(
         destination,
         Land,
         active_player_id,
         has_wall,
-        building,
+        Building(Wild,0),
         character
         );
     // Removing character from origin tile
@@ -474,8 +476,49 @@ void Game::move_character(coordinates source, coordinates destination){
         map.get_Tile(source).get_building(),
         Character(Empty,false)
         );
+    // Destroy adjacent walls if needed
+    if(building_destroyed){
+        // Destroying a building. Check for adjacent walls to remove
+        for(coordinates neighbour : get_neighbours_locations(destination)){
+            // Checking if an ally building is in range, otherwise destroy wall
+            bool has_wall = false;
+            for(coordinates adj_to_neighbour : get_neighbours_locations(neighbour)){
+                has_wall = has_wall ||
+                (map.get_Tile(adj_to_neighbour).get_building().get_type() != Wild &&
+                map.get_Tile(adj_to_neighbour).get_owner() == map.get_Tile(neighbour).get_owner());
+            }
+            set_wall(neighbour, has_wall);
+        }
+    }
     // Updating provinces
     update_provinces();
+}
+
+void Game::place_unit(coordinates location){
+    // Place unit
+    map.set_Tile(
+        location,
+        Land,
+        active_player_id,
+        map.get_Tile(location).get_wall(),
+        cursor_infos.get_building(),
+        cursor_infos.get_character()
+    );
+    // Remove gold
+    int to_pay = 0;
+    to_pay += cursor_infos.get_character().get_cost();
+    to_pay += cursor_infos.get_building().get_cost();
+    pay_for(location,to_pay);
+    
+    if(cursor_infos.get_building().get_type() == Fortress){
+        set_wall(location,true);
+        // If the unit is a fortress, add walls on neighbours
+        for(coordinates neighbour : get_neighbours_locations(location)){
+            if(map.get_Tile(neighbour).get_owner() == active_player_id){
+                set_wall(neighbour,true);
+            }
+        }
+    }
 }
 
 void Game::on_tile_click(coordinates location){
@@ -487,20 +530,7 @@ void Game::on_tile_click(coordinates location){
         (map.get_Tile(location).get_character().get_type() == Empty) &&
         (map.get_Tile(location).get_building().get_type() == Wild)){
             // Unit can be placed
-            // Place unit
-            map.set_Tile(
-                location,
-                Land,
-                active_player_id,
-                map.get_Tile(location).get_wall(),
-                cursor_infos.get_building(),
-                cursor_infos.get_character()
-            );
-            // Remove gold
-            int to_pay = 0;
-            to_pay += cursor_infos.get_character().get_cost();
-            to_pay += cursor_infos.get_building().get_cost();
-            pay_for(location,to_pay);
+            place_unit(location);
         }
         cursor_infos = Tile::default_Tile();
         selected_location = coordinates(-1,-1);
