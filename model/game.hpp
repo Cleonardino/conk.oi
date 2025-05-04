@@ -2,32 +2,10 @@
 #define GAME_HPP
 
 #include <iostream>
-#include <stack>
-#include <set>
 #include "map.hpp"
 #include "parser.hpp"
 #include "game_constants.hpp"
-
-// A class consisting of a collection of tiles locations, and all informations relevant to a province.
-class Province{
-    private:
-    std::set<coordinates> locations;
-    int owner_id;
-    int gold;
-    int income;
-
-    public:
-    Province(int owner_id);
-    int add_gold(int amount);
-    int get_gold() const;
-    int get_owner() const;
-    int get_income() const;
-    std::set<coordinates> get_locations() const;
-    bool does_contain(coordinates location) const;
-    void add_location(coordinates location);
-
-    friend std::ostream& operator<<(std::ostream& os, const Province& province);
-};
+#include "province.hpp"
 
 // A class containing all processed data of a tile that is needed to display it.
 class TileDisplayInfos{
