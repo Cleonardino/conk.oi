@@ -25,6 +25,39 @@ void Character::refresh(){
     has_moved = false;
 }
 
+// Get cost of character
+int Character::get_cost(){
+    switch (type)
+    {
+    case Peasant:
+        return PEASANT_COST;
+    case Soldier:
+        return SOLDIER_COST;
+    case Knight:
+        return KNIGHT_COST;
+    case Hero:
+        return HERO_COST;
+    default:
+        return 0;
+    }
+}
+
+// Get upkeep cost of character
+int Character::get_upkeep(){
+    switch (type)
+    {
+    case Peasant:
+        return PEASANT_UPKEEP;
+    case Soldier:
+        return SOLDIER_UPKEEP;
+    case Knight:
+        return KNIGHT_UPKEEP;
+    case Hero:
+        return HERO_UPKEEP;
+    default:
+        return 0;
+    }
+}
 
 // Class constructor
 Building::Building(BuildingType type_):
@@ -39,6 +72,28 @@ BuildingType Building::get_type() const{
 // Return gold in building
 int Building::get_gold() const{
     return gold;
+}
+
+// Get cost of building
+int Building::get_cost(){
+    switch (type)
+    {
+    case Fortress:
+        return FORTRESS_COST;
+    default:
+        return 0;
+    }
+}
+
+// Get upkeep cost of building
+int Building::get_upkeep(){
+    switch (type)
+    {
+    case Fortress:
+        return FORTRESS_UPKEEP;
+    default:
+        return 0;
+    }
 }
 
 // Class constructor

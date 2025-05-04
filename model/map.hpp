@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include "game_constants.hpp"
 
 using coordinates = std::pair<int,int>;
 
@@ -32,6 +33,8 @@ class Character{
     bool get_has_moved() const;
     void exhaust();
     void refresh();
+    int get_cost();
+    int get_upkeep();
 };
 
 enum BuildingType {
@@ -49,6 +52,8 @@ class Building{
     Building(BuildingType type_);
     BuildingType get_type() const;
     int get_gold() const;
+    int get_cost();
+    int get_upkeep();
 };
 
 // A class that represent all the data associated with a tile.

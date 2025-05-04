@@ -37,30 +37,10 @@ std::set<coordinates> Province::get_locations() const{
 void Province::add_location(coordinates location, Tile tile){
     locations.insert(location);
     income++;
-    switch (tile.get_building().get_type())
-    {
-    case Town:
+    income -= tile.get_character().get_upkeep();
+    income -= tile.get_building().get_upkeep();
+    if(tile.get_building().get_type() == Town){
         gold += tile.get_building().get_gold();
-        break;
-    case Fortress:
-        income -= FORTRESS_UPKEEP;
-        break;
-    }
-
-    switch (tile.get_character().get_type())
-    {
-    case Peasant:
-        income -= PEASANT_UPKEEP;
-        break;
-    case Soldier:
-        income -= SOLDIER_UPKEEP;
-        break;
-    case Knight:
-        income -= KNIGHT_UPKEEP;
-        break;
-    case Hero:
-        income -= HERO_UPKEEP;
-        break;
     }
 }
 

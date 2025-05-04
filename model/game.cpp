@@ -470,11 +470,15 @@ void Game::on_tile_click(coordinates location){
                 cursor_infos.get_character()
             );
             // Remove gold
+            int to_pay = 
             for(Province province : provinces){
                 if(province.does_contain(selected_location)){
-                    // Selected province, find closest city
+                    // Selected province
                 }
             }
+        }else{
+            cursor_infos = Tile::default_Tile();
+            selected_location = coordinates(-1,-1);
         }
     }
 
