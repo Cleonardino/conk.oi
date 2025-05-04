@@ -10,6 +10,10 @@
 #include "game_utils.hpp"
 #include "gamestamp.hpp"
 
+// Used for bandit movement
+#include <random>
+#include <algorithm>
+
 // A class containing all the informations of the current game's state as well as the map.
 class Game{
     private:
@@ -52,6 +56,7 @@ class Game{
     void rebel(Province province);
     void standard_upkeep(Province province);
     void compute_income(int player_id);
+    void bandits_turn();
     
     public:
     Game(Map map_, int active_player_id_, std::vector<Province> provinces_);

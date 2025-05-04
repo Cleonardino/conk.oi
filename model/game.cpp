@@ -219,15 +219,34 @@ void Game::rebel(Province province){
     for(coordinates location : province.get_locations()){
         if(map.get_Tile(location).get_character().get_type() != Empty &
             map.get_Tile(location).get_character().get_type() != Bandit){
-            // Stranded unit, go rogue
-            map.set_Tile(
-                location,
-                Land,
-                province.get_owner(),
-                map.get_Tile(location).get_wall(),
-                Building(Wild,0),
-                Character(Bandit,false)
-            );
+            // Rebel unit, go rogue
+            bool camp_nearby = false;
+            for(coordinates neighbour : get_neighbours_locations(location)){
+                camp_nearby = camp_nearby || (map.get_Tile(neighbour).get_building().get_type() == Town
+                && map.get_Tile(neighbour).get_owner() == -1);
+            }
+            if(camp_nearby){
+                // Create bandit
+                map.set_Tile(
+                    location,
+                    Land,
+                    province.get_owner(),
+                    map.get_Tile(location).get_wall(),
+                    Building(Wild,0),
+                    Character(Bandit,false)
+                );
+            }else{
+                // Create camp
+                map.set_Tile(
+                    location,
+                    Land,
+                    -1,
+                    true,
+                    Building(Town,0),
+                    Character(Empty,false)
+                );  
+            }
+            
         }
     }
 }
@@ -449,19 +468,21 @@ std::ostream& operator<<(std::ostream& os, const Game& game){
 }
 
 bool Game::is_possible_to_move(coordinates destination) const{
-    // If no character is selected,the character is sleeping or the
+    // If no character is selected,the character is sleeping, is a bandit or the
     // selected tile don't belong to the active player, no destination is marked as valid
     if(map.get_Tile(selected_location).get_owner() != active_player_id ||
         map.get_Tile(selected_location).get_character().get_type() == Empty ||
+        map.get_Tile(selected_location).get_character().get_type() == Bandit ||
         map.get_Tile(selected_location).get_character().get_has_moved()){
         return false;
     }
 
     if(map.get_Tile(destination).get_owner() == map.get_Tile(selected_location).get_owner()){
-        // Same owner, valid only if empty or with same character except hero
+        // Same owner, valid only if empty or bandit or with same character except hero
         return (
             (
                 map.get_Tile(destination).get_character().get_type() == Empty ||
+                map.get_Tile(destination).get_character().get_type() == Bandit ||
                 map.get_Tile(destination).get_character().get_type() == map.get_Tile(selected_location).get_character().get_type()
             )
             &&
@@ -513,6 +534,10 @@ int Game::get_singular_power_level(coordinates location) const{
 // Compute power level of a tile
 int Game::get_power_level(coordinates location) const{
     int result = get_singular_power_level(location);
+    if(map.get_Tile(location).get_owner() == -1){
+        // If bandit, don't use protection from town
+        return result;
+    }
     for(coordinates neighbour : get_neighbours_locations(location)){
         if(map.get_Tile(neighbour).get_owner() == map.get_Tile(location).get_owner()){
             // If same owner, use protection
@@ -520,6 +545,77 @@ int Game::get_power_level(coordinates location) const{
         }
     }
     return result;
+}
+
+// All computations for bandits turn
+void Game::bandits_turn(){
+    // For each bandit, if on walls or bandit tile, move. Else steal
+    for(int i = 0; i < map.get_height(); i++){
+        for(int j = 0; j < map.get_width(); j++){
+            if(map.get_Tile(coordinates(i,j)).get_character().get_type() == Bandit &&
+            !map.get_Tile(coordinates(i,j)).get_character().get_has_moved()){
+                // Ready Bandit
+                if(map.get_Tile(coordinates(i,j)).get_owner() != -1 ||
+                map.get_Tile(coordinates(i,j)).get_wall()){
+                    std::cout << i << "," << j << " moving" << std::endl;
+                    // Try to move
+                    std::vector<coordinates> neighbours = get_neighbours_locations(coordinates(i,j));
+
+                    // Shuffle neighbours
+                    std::vector<int> index(neighbours.size());
+                    for(int i = 0; i < neighbours.size(); ++i){
+                        index[i] = i;
+                    }
+                        
+                    // Shuffling
+                    std::random_device rd;
+                    std::mt19937 g(rd());
+                    std::shuffle(index.begin(), index.end(), g);
+                    bool has_moved_on_turn = false;
+                    for(int i : index){
+                        if(
+                            !has_moved_on_turn &&
+                            !map.get_Tile(neighbours[i]).get_wall() &&
+                            map.get_Tile(neighbours[i]).get_building().get_type() == Wild &&
+                            map.get_Tile(neighbours[i]).get_character().get_type() == Empty
+                            ){
+                                std::cout << neighbours[i].first << "," << neighbours[i].second << " go" << std::endl;
+                                has_moved_on_turn = true;
+                                // Move to tile
+                                map.set_Tile(
+                                    coordinates(i,j),
+                                    Land,
+                                    map.get_Tile(coordinates(i,j)).get_owner(),
+                                    map.get_Tile(coordinates(i,j)).get_wall(),
+                                    map.get_Tile(coordinates(i,j)).get_building(),
+                                    Character(Empty,false)
+                                );
+                                map.set_Tile(
+                                    neighbours[i],
+                                    Land,
+                                    map.get_Tile(coordinates(i,j)).get_owner(),
+                                    map.get_Tile(coordinates(i,j)).get_wall(),
+                                    map.get_Tile(coordinates(i,j)).get_building(),
+                                    Character(Bandit,true)
+                                );
+                            }
+                    }
+
+                }else{
+                    std::cout << i << "," << j << " stealing" << std::endl;
+                    // Steal
+                    map.set_Tile(
+                        coordinates(i,j),
+                        Land,
+                        -1,
+                        false,
+                        Building(Wild,0),
+                        Character(Bandit,true)
+                    );
+                }
+            }
+        }
+    }
 }
 
 // Update selected_province and valid_destination boolean matrixes.
@@ -774,6 +870,11 @@ void Game::on_end_turn(){
     compute_income(active_player_id);
     update_provinces();
     update_select();
+    if(active_player_id == -1){
+        // If player is bandit, play bandit and next turn
+        bandits_turn();
+        on_end_turn();
+    }
 }
 
 // When pressing the rewind button
