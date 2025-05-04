@@ -38,7 +38,14 @@ void TileManager::DrawTile(SDL_Renderer* renderer, std::map<int, std::map<int, T
         case Wild:
             break;
         case Town:
-            TextureManager::Draw(renderer, textures[TOWN_TILE][player_id].get(), dest);
+            if (player_id == -1)
+            {
+                TextureManager::Draw(renderer, textures[CAMP_TILE][0].get(), dest);
+            }
+            else
+            {
+                TextureManager::Draw(renderer, textures[TOWN_TILE][player_id].get(), dest);
+            }
             break;
         case Fortress:
             TextureManager::Draw(renderer, textures[FORTRESS_TILE][player_id].get(), dest);
