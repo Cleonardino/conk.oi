@@ -746,7 +746,7 @@ bool Display::InLevel(int posx, int posy)
 
 bool Display::InPlay(int posx, int posy)
 {
-    if (nowPlaying)
+    if (nowPlaying or inLevelSelection)
     {
         return false;
     }
